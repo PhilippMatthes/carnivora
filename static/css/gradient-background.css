@@ -1,0 +1,9 @@
+.gradient-background {
+    background: -moz-linear-gradient(45deg, #1D976C 0%, #93F9B9 100%); /* ff3.6+ */
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, #1D976C), color-stop(100%, #93F9B9)); /* safari4+,chrome */
+    background: -webkit-linear-gradient(45deg, #1D976C 0%, #93F9B9 100%); /* safari5.1+,chrome10+ */
+    background: -o-linear-gradient(45deg, #1D976C 0%, #93F9B9 100%); /* opera 11.10+ */
+    background: -ms-linear-gradient(45deg, #1D976C 0%, #93F9B9 100%); /* ie10+ */
+    background: linear-gradient(45deg, #1D976C 0%, #93F9B9 100%); /* w3c */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#93F9B9', endColorstr='#1D976C',GradientType=0 ); /* ie6-9 */
+}

@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
-<h1>Hello {{ variable }}, welcome to my awesome site</h1>
+{% extends 'base.html' %}
 
-</body>
+{% load static %}
 
-<script>
-    $.ajax({
-    url: '127.0.0.1:8000/hello',
-    type: 'get', // This is the default though, you don't actually need to always mention it
-    success: function(data) {
-        alert(data);
-    },
-    failure: function(data) {
-        alert('Got an error dude');
-    }
-});
-</script>
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+
+    <!--
+    <div class="ui content" style="margin: auto; width: 200px; height: 200px;">
+        <img height="200" width="200" src="{% static '/icon/carnivorous-plant-flat.png' %}">
+    </div>
+    /-->
+    <div style="padding-top: 20px;">
+        <div class="ui cards">
+            <div class="card" style="margin: auto;">
+                <div class="image">
+                    <img src="{% static '/img/pb.jpg' %}">
+                </div>
+                <div class="content">
+                    <div class="header">snrmtths</div>
+                    <div class="meta">
+                      <a>Current State</a>
+                    </div>
+                    <div class="description">
+                        123456
+                    </div>
+                </div>
+                <div class="extra content">
+                    <div class="ui two buttons">
+                        <div class="ui basic green button">Start</div>
+                        <div class="ui basic red button">Stop</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
 </html>
