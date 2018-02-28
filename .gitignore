@@ -11,6 +11,8 @@ out/
 *.sqlite3
 *.DS_Store
 
+log/
+
 # C extensions
 *.so
 

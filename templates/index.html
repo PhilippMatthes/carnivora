@@ -9,40 +9,28 @@
 
 {% block content %}
 
-<table id="_appendHere" class="table table-striped table-condensed">
-    <tr>
-        <th>Reg.nr.</th>
-        <th>M&auml;rke</th>
-        <th>Modell</th>
-    </tr>
-    {% for line in lines %}
-        <tr>
-            <td>Test1</td>
-            <td>Test2</td>
-            <td>Test3</td>
-        </tr>
-    {% endfor %}
+<table id="auto-updating-monitor" class="ui table">
+    <thead>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Image</th>
+    </thead>
 </table>
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script>
-
-console.log("1");
-var append_increment = 0;
-function get_tables() {
-    console.log("2");
+function get_monitor_updates() {
+    console.log("Performing AJAX Request to get monitor updates.");
     $.ajax({
         type: "GET",
-        url: {% url 'get_more_tables' %},
-        data: {'append_increment': append_increment}
+        url: {% url 'table_monitor_update' %}
     })
     .done(function(response) {
-        $('#_appendHere').append(response);
-        append_increment += 10;
-        console.log("3");
+        $('#auto-updating-monitor').prepend(response);
+        console.log("Monitor Updates AJAX Request succeeded.");
     })
 }
-setInterval(get_tables, 1000)
+setInterval(get_monitor_updates, 1000)
 
 </script>
 
