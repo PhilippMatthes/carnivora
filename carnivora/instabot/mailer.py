@@ -6,8 +6,8 @@ import urllib3
 import pickle
 import matplotlib.pyplot as plt
 
-from config import Config
-from log import Log
+from carnivora.instabot.config import Config
+from carnivora.instabot.log import Log
 
 telepot.api._pools = {
     'default': urllib3.PoolManager(num_pools=3, maxsize=10, retries=10, timeout=240),

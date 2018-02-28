@@ -8,8 +8,8 @@ import datetime  # For timestamp
 import pickle  # For data management
 import os
 
-from mailer import Mailer
-from config import Config
+from carnivora.instabot.mailer import Mailer
+from carnivora.instabot.config import Config
 
 if Config.headless_is_available:
     from xvfbwrapper import Xvfb
