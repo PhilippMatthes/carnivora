@@ -1,5 +1,5 @@
-from instabot.driver import Driver
-from instabot.mailer import Mailer
+from carnivora.instabot.driver import Driver
+from carnivora.instabot.mailer import Mailer
 from time import sleep
 import traceback
 import sys
