@@ -1,7 +1,7 @@
 import operator
 import pickle
 
-from carnivora.instabot.config import Config
+from config import Config
 
 
 class Statistics:
