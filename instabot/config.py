@@ -20,7 +20,7 @@ class Config:
     start_url = "https://www.instagram.com/accounts/login/"
     following_link = "https://www.instagram.com/snrmtths/following/"
     account_url = "https://www.instagram.com/snrmtths/"
-    headless_is_available = False
+    headless_is_available = True
 
     # The following (xpath) classes need to be refreshed every now and then.
     # they define, where elements are located on Instagram.

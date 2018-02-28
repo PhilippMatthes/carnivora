@@ -27,3 +27,4 @@ class Log:
         with open(Config.bot_path + "log/log.pickle", "wb") as f:
             pickle.dump([], f)
         return log
+

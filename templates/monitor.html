@@ -1,0 +1,22 @@
+<table id="auto-updating-monitor" class="ui table">
+    <thead>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Image</th>
+    </thead>
+</table>
+
+<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
+<script>
+function get_monitor_updates() {
+    $.ajax({
+        type: "GET",
+        url: {% url 'table_monitor_update' %}
+    })
+    .done(function(response) {
+        $('#auto-updating-monitor').prepend(response);
+    })
+}
+setInterval(get_monitor_updates, 10000)
+
+</script>

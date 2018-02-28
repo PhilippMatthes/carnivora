@@ -1,40 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{% extends 'base.html' %}
-
 {% load static %}
 
-{% block title %}Index{% endblock %}
+<head>
+    <link rel='stylesheet' type='text/css' href="{% static '/css/Semantic-UI-CSS-master/semantic.css' %}" />
+    <link rel='stylesheet' type='text/css' href="{% static '/css/gradient-background.css' %}" />
+    <meta charset="UTF-8">
+    <title>carnivora</title>
+    <meta name="author" content="Philipp Matthes" />
+</head>
 
-{% block content %}
+<body class="gradient-background">
 
-<table id="auto-updating-monitor" class="ui table">
-    <thead>
-        <th>Date</th>
-        <th>Description</th>
-        <th>Image</th>
-    </thead>
-</table>
+<div class="ui top attached tabular menu">
+    <a class="active item" id="monitor" onclick="request('/monitor/'); toggle('monitor')">Monitor</a>
+    <a class="item" id="followed_users" onclick="request('/followed_users/'); toggle('followed_users')">Followed Users</a>
+    <a class="item" id="hashtags" onclick="request('/hashtags/'); toggle('hashtags')">Hashtags</a>
+    <a class="item" id="settings" onclick="request('/settings/'); toggle('settings')">Settings</a>
+</div>
+<div class="ui bottom attached segment">
+  <p id="ajax-replace"></p>
+</div>
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script>
-function get_monitor_updates() {
-    console.log("Performing AJAX Request to get monitor updates.");
-    $.ajax({
-        type: "GET",
-        url: {% url 'table_monitor_update' %}
-    })
-    .done(function(response) {
-        $('#auto-updating-monitor').prepend(response);
-        console.log("Monitor Updates AJAX Request succeeded.");
-    })
-}
-setInterval(get_monitor_updates, 1000)
-
+    function request(url) {
+        $.ajax({
+            type: "GET",
+            url: url
+        })
+        .done(function(response) {
+            $('#ajax-replace').html(response);
+        })
+    }
+    request('/monitor/')
 </script>
 
-{% endblock %}
+<script>
+    function toggle(id) {
+        var x = document.getElementsByClassName("active item");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            x[i].className = "item";
+        }
+        document.getElementById(id).className = "active item";
+    }
+</script>
 
 
+</body>
 </html>

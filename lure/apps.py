@@ -9,3 +9,4 @@ class LureConfig(AppConfig):
 
     def ready(self):
         subprocess.Popen(['python3', 'instabot/main.py'])
+        pass

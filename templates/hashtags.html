@@ -1,0 +1,20 @@
+<table id="hashtags-table" class="ui table">
+    <thead>
+        <th>Hashtag</th>
+        <th>Description</th>
+    </thead>
+</table>
+
+<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
+<script>
+function get_monitor_updates() {
+    $.ajax({
+        type: "GET",
+        url: {% url 'hashtags_update' %}
+    })
+    .done(function(response) {
+        $('#hashtags-table').append(response);
+    })
+}
+get_monitor_updates()
+</script>
