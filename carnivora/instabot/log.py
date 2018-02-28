@@ -1,6 +1,6 @@
 import pickle
 
-from config import Config
+from carnivora.instabot.config import Config
 
 
 class Log:
