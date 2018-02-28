@@ -1,5 +1,5 @@
 class Config:
-    bot_path = "/Users/philippmatthes/Desktop/carnivora/instabot/"
+    bot_path = "carnivora/instabot/"
 
     topics = ["graphics",
               "render",

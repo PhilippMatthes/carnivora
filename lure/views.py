@@ -1,9 +1,8 @@
-from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response
 
 # Create your views here.
-from instabot.log import Log
-from instabot.statistics import Statistics
+from carnivora.instabot.log import Log
+from carnivora.instabot.statistics import Statistics
 
 
 def index(request):
