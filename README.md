@@ -1,8 +1,6 @@
 # carnivora
 
-This is the Repository for my Django Instagram Bot Wrapper. 
-
-The Instagram bot gently simulates real user behaviour by automatedly liking, commenting, following and unfollowing. Uses the telepot API for remote controlling and an optimization algorithm which detects and chooses from the most profitable Instagram hashtags. 
+![Showcase](MOCKUP.jpg?raw=true "DragTimer App")
 
 ## Dependencies
 
@@ -16,3 +14,12 @@ Carnivora uses the following libraries:
 - urllib
 - urllib3
 - telepot
+
+### Controlling the bot via Telegram
+
+```
+Start - Starts the bot in the initial phase
+Stop - Terminates the bot. It will not be able to run again!
+Pause - Pauses the bot.
+Continue - Continues after pausing the bot.
+```
