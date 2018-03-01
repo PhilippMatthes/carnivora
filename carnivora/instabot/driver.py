@@ -472,7 +472,7 @@ class Driver(object):
                         if self.post_is_sfw():
                             self.comment(top_hashtags[topic_selector])
                             self.store_hashtags()
-                            self.next_picture()
+                        self.next_picture()
                 for likes in range(3):
 
                     sleep(1)
@@ -482,28 +482,28 @@ class Driver(object):
                         if self.post_is_sfw():
                             self.like(top_hashtags[topic_selector])
                             self.store_hashtags()
-                            self.next_picture()
+                        self.next_picture()
                 for follows in range(3):
 
                     sleep(1)
 
                     if not self.error():
-                        if self.post_is_sfw():
-                            self.check_for_exit_command()
-                            self.next_picture()
+                        self.check_for_exit_command()
+                        self.next_picture()
 
-                            sleep(3)
+                        sleep(3)
 
-                            count = 0
-                            while self.user_followed_already(self.author()) and count < 10:
+                        count = 0
+                        while self.user_followed_already(self.author()) and count < 10:
+                            if self.post_is_sfw():
                                 self.check_for_exit_command()
                                 self.mailer.send(self.author() + " was followed already. Skipping picture.")
                                 Log.update(text=self.author() + " was followed already. Skipping picture.")
-                                self.next_picture()
-                                count += 1
-                                sleep(1)
-                            self.follow(top_hashtags[topic_selector])
-                            self.store_hashtags()
+                            self.next_picture()
+                            count += 1
+                            sleep(1)
+                        self.follow(top_hashtags[topic_selector])
+                        self.store_hashtags()
 
                 if len(self.accounts_to_unfollow) > 50:
                     for unfollows in range(3):
