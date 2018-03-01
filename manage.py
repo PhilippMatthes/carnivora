@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import os
 import sys
 import subprocess
@@ -9,7 +11,7 @@ if __name__ == "__main__":
     try:
         p = subprocess.Popen(['python3', 'run_instabot.py'])
     except EnvironmentError as e:  #
-        sys.exit('failed to start %r, reason: %s' % (executable, e))
+        sys.exit('Failed to start subprocess.')
 
     print("Launching server with the following work directories:")
     for path in sys.path:
