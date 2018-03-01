@@ -442,8 +442,8 @@ class Driver(object):
         if image_url == "" or image_url is None:
             return True
         sfw, nsfw = classify_nsfw(image_url)
-        self.mailer.send("Analysis of this post yielded it to be {}% SFW and {}% NSFW.".format(sfw, nsfw))
-        Log.update(text="Analysis of this post yielded it to be {}% SFW and {}% NSFW.".format(sfw, nsfw),
+        self.mailer.send("Analysis of this post yielded it to be {}% NSFW.".format(int(100*nsfw)))
+        Log.update(text="Analysis of this post yielded it to be {}% NSFW.".format(int(100*nsfw)),
                    image=image_url)
         return nsfw < sfw
 
