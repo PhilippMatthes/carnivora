@@ -9,6 +9,8 @@ from carnivora.instabot.mailer import Mailer
 from carnivora.instabot.config import Config
 from carnivora.instabot.log import Log
 
+from tf_open_nsfw.classify_nsfw import classify_nsfw
+
 if Config.headless_is_available:
     from xvfbwrapper import Xvfb
 
@@ -435,6 +437,17 @@ class Driver(object):
         if msg == "Exit" or msg == "Pause" or msg == "Stop":
             raise Exception("User ended the program by telegram message")
 
+    def post_is_sfw(self):
+        image_url = self.extract_picture_source()
+        if image_url == "" or image_url is None:
+            return True
+        sfw, nsfw = classify_nsfw(image_url)
+        self.mailer.send("Analysis of this post yielded it to be {}% SFW and {}% NSFW.")
+        Log.update(text="Analysis of this post yielded it to be {}% SFW and {}% NSFW.".format(sfw, nsfw),
+                   image=image_url)
+        return nsfw < sfw
+
+
     def like_follow_loop(self):
         self.login()
         while True:
@@ -456,38 +469,41 @@ class Driver(object):
                 if topic_selector % 7 == 2:
                     self.check_for_exit_command()
                     if not self.error():
-                        self.comment(top_hashtags[topic_selector])
-                        self.store_hashtags()
-                        self.next_picture()
+                        if self.post_is_sfw():
+                            self.comment(top_hashtags[topic_selector])
+                            self.store_hashtags()
+                            self.next_picture()
                 for likes in range(3):
 
                     sleep(1)
 
                     self.check_for_exit_command()
                     if not self.error():
-                        self.like(top_hashtags[topic_selector])
-                        self.store_hashtags()
-                        self.next_picture()
+                        if self.post_is_sfw():
+                            self.like(top_hashtags[topic_selector])
+                            self.store_hashtags()
+                            self.next_picture()
                 for follows in range(3):
 
                     sleep(1)
 
                     if not self.error():
-                        self.check_for_exit_command()
-                        self.next_picture()
-
-                        sleep(3)
-
-                        count = 0
-                        while self.user_followed_already(self.author()) and count < 10:
+                        if self.post_is_sfw():
                             self.check_for_exit_command()
-                            self.mailer.send(self.author() + " was followed already. Skipping picture.")
-                            Log.update(text=self.author() + " was followed already. Skipping picture.")
                             self.next_picture()
-                            count += 1
-                            sleep(1)
-                        self.follow(top_hashtags[topic_selector])
-                        self.store_hashtags()
+
+                            sleep(3)
+
+                            count = 0
+                            while self.user_followed_already(self.author()) and count < 10:
+                                self.check_for_exit_command()
+                                self.mailer.send(self.author() + " was followed already. Skipping picture.")
+                                Log.update(text=self.author() + " was followed already. Skipping picture.")
+                                self.next_picture()
+                                count += 1
+                                sleep(1)
+                            self.follow(top_hashtags[topic_selector])
+                            self.store_hashtags()
 
                 if len(self.accounts_to_unfollow) > 50:
                     for unfollows in range(3):

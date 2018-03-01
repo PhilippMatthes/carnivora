@@ -8,7 +8,7 @@ from tensorflow.python.tools import optimize_for_inference_lib
 
 sys.path.append((os.path.normpath(
                  os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                              '..'))))
+                              '../../tf-open_nsfw'))))
 
 from model import OpenNsfwModel, InputType
 

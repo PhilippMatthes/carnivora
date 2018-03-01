@@ -13,10 +13,7 @@ def create_yahoo_image_loader():
     from PIL import Image
     from io import BytesIO
 
-    def load_image(image_path):
-        pimg = open(image_path, 'rb').read()
-
-        img_data = pimg
+    def load_image(img_data):
         im = Image.open(BytesIO(img_data))
 
         if im.mode != "RGB":

@@ -16,7 +16,7 @@ from tensorflow.python.saved_model.signature_constants import PREDICT_OUTPUTS
 
 sys.path.append((os.path.normpath(
                  os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                              '..'))))
+                              '../../tf-open_nsfw'))))
 
 from model import OpenNsfwModel, InputType
 
