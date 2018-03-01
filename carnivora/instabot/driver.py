@@ -3,13 +3,11 @@ from time import sleep
 import time
 from selenium.webdriver.common.keys import Keys  # For input processing
 from random import randint
-import sys  # For file path processing
-import datetime  # For timestamp
 import pickle  # For data management
-import os
 
 from carnivora.instabot.mailer import Mailer
 from carnivora.instabot.config import Config
+from carnivora.instabot.log import Log
 
 if Config.headless_is_available:
     from xvfbwrapper import Xvfb
@@ -110,20 +108,14 @@ class Driver(object):
 
     # Logs into Instagram automatically
     def login(self):
-
         self.mailer.send("Logging in.")
-        print("Logging in.")
+        Log.update(text="Logging in")
         self.browser.get(Config.start_url)
         sleep(5)
 
-        if (self.browser.current_url == "https://www.instagram.com/"):
+        if self.browser.current_url == "https://www.instagram.com/":
             return
-        if (self.mailer.get_current_message() == "Pause"):
-            self.mailer.send("Bot paused.")
-            raise Exception("Bot paused.")
-        if (self.mailer.get_current_message() == "Stop"):
-            self.mailer.send("Bot stopped.")
-            raise Exception("Bot stopped.")
+        self.check_for_exit_command()
 
         try:
             username_field = self.browser.find_element_by_name("username")
@@ -135,9 +127,10 @@ class Driver(object):
             return
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.login')
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.login: '+str(e)[:100])
+            Log.update(text='Exception in self.login: '+str(e))
             sleep(1)
             self.login()
             return
@@ -152,7 +145,7 @@ class Driver(object):
             comment_field.send_keys(say)
             comment_field.send_keys(Keys.RETURN)
             self.mailer.send("Commented on " + str(self.author()) + "s picture with: " + say + "\n")
-            print("Commented on " + str(self.author()) + "s picture with: " + say)
+            Log.update(text="Commented on " + str(self.author()) + "s picture with: " + say + "\n")
 
             if self.author() not in self.actionList.keys():
                 value = {"type": "comment", "time": self.timestamp(), "topic": topic}
@@ -168,16 +161,15 @@ class Driver(object):
             sleep(1)
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.comment')
-            self.mailer.send("Comment field not found.\n")
-            print("Comment field not found.")
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.comment: '+str(e)[:100])
+            Log.update(text='Exception in self.comment: '+str(e))
 
     # Searches for a certain topic
     def search(self, query):
         self.mailer.send("Searching for " + query + ".")
-        print("Searching for " + query + ".")
+        Log.update(text="Searching for " + query + ".")
         self.browser.get("https://www.instagram.com/explore/tags/" + query + "/")
 
     # Checks for error which occurs when pictures are removed while
@@ -186,8 +178,8 @@ class Driver(object):
         try:
             error_message = self.browser.find_element_by_xpath(Config.error_xpath)
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Page loading error')
-            print("Page loading error.")
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Page loading error: '+str(error_message))
+            Log.update(text='Page loading error: '+str(error_message))
             return True
         except KeyboardInterrupt:
             return
@@ -198,7 +190,6 @@ class Driver(object):
     def select_first(self):
         try:
             pictures = self.browser.find_elements_by_xpath(Config.first_ele_xpath)
-            print("Found " + str(len(pictures)) + " pictures.")
             first_picture = None
             if len(pictures) > 9:
                 first_picture = pictures[9]
@@ -210,9 +201,10 @@ class Driver(object):
             return True
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.select_first')
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.select_first: '+str(e)[:100])
+            Log.update(text='Exception in self.select_first: '+str(e))
             sleep(5)
             return False
 
@@ -225,9 +217,10 @@ class Driver(object):
             return
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.next_picture')
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.next_picture: '+str(e)[:100])
+            Log.update(text='Exception in self.next_picture: '+str(e))
             self.browser.execute_script("window.history.go(-1)")
             sleep(5)
             self.select_first()
@@ -240,26 +233,26 @@ class Driver(object):
             return str(author.get_attribute("title"))
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.author')
-            self.mailer.send("Author xpath not found.\n")
-            print("Author xpath not found.")
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.author: '+str(e)[:100])
+            Log.update(text='Exception in self.author: '+str(e))
             return ""
 
     # Checks if the post is already liked
     def already_liked(self):
         try:
-            full = self.browser.find_element_by_xpath(Config.like_button_full_xpath)
+            _ = self.browser.find_element_by_xpath(Config.like_button_full_xpath)
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
             self.mailer.send_image(Config.bot_path + 'log/error.png', 'Image was already liked.')
+            Log.update(text='Image was already liked.')
             return True
         except:
             return False
 
     def on_post_page(self):
         try:
-            full = self.browser.find_element_by_xpath(Config.next_button_xpath)
+            _ = self.browser.find_element_by_xpath(Config.next_button_xpath)
             return False
         except:
             return True
@@ -269,17 +262,23 @@ class Driver(object):
         count = 0
         while self.already_liked() and count < 10:
             self.mailer.send("Post already liked. Skipping.\n")
-            print("Post already liked. Skipping.")
+            Log.update(text="Post already liked. Skipping.")
             self.next_picture()
             if self.on_post_page():
                 self.browser.save_screenshot(Config.bot_path + 'log/error.png')
                 self.mailer.send_image(Config.bot_path + 'log/error.png', 'Accidently swapped to post page.')
+                Log.update(text='Accidently swapped to post page.')
                 return
-            count = count + 1
+            count += 1
             sleep(1)
         try:
+            like_button = self.browser.find_element_by_xpath(Config.like_button_xpath)
+            like_button.click()
+
+            src = self.extract_picture_source()
+
             self.mailer.send("Liked picture/video by: " + self.author() + ".\n")
-            print("Liked picture/video by: " + self.author() + ".")
+            Log.update(text="Liked picture/video by: " + self.author() + ".\n", image=src)
 
             if self.author() not in self.actionList.keys():
                 value = {"type": "like", "time": self.timestamp(), "topic": topic}
@@ -292,16 +291,14 @@ class Driver(object):
             with open(Config.bot_path + "log/actionList.pickle", "wb") as userfile:
                 pickle.dump(self.actionList, userfile)
 
-            like_button = self.browser.find_element_by_xpath(Config.like_button_xpath)
-            like_button.click()
-            sneaksleep = randint(0, 10) + Config.delay
-            sleep(sneaksleep)
+            sleep(randint(0, 10) + Config.delay)
             return
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.like')
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.like: '+str(e)[:100])
+            Log.update(text='Exception in self.like: '+str(e))
             sleep(Config.delay)
             self.search(topic)
             self.select_first()
@@ -316,15 +313,13 @@ class Driver(object):
             unfollow_button = self.browser.find_element_by_xpath(Config.unfollow_xpath)
             unfollow_button.click()
             self.mailer.send("Unfollowed: " + name + ".\n")
-            print("Unfollowed: " + name)
             sleep(2)
         except KeyboardInterrupt:
             return
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.unfollow')
-            self.mailer.send("Unfollow button not found.\n")
-            print("Unfollow button not found.")
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.unfollow: '+str(e)[:100])
+            Log.update(text='Exception in self.unfollow: '+str(e))
             sleep(1)
 
     # Follows a user
@@ -334,7 +329,7 @@ class Driver(object):
             follow = self.browser.find_element_by_xpath(Config.follow_xpath)
             follow.click()
             self.mailer.send("Followed: " + self.author() + "\n")
-            print("Followed: " + self.author())
+            Log.update(text="Followed: " + self.author())
             with open(Config.bot_path + "log/followed_users.pickle", "wb") as userfile:
                 pickle.dump(self.accounts_to_unfollow, userfile)
 
@@ -354,11 +349,10 @@ class Driver(object):
             with open(Config.bot_path + "log/followed_users_all_time.pickle", "wb") as userfile:
                 pickle.dump(self.followed_accounts, userfile)
             sleep(Config.delay + randint(0, 10))
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.follow')
-            self.mailer.send("Follow button not found.\n")
-            print("Follow button not found.")
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.follow: '+str(e)[:100])
+            Log.update(text='Exception in self.follow: '+str(e))
             sleep(1)
 
     def open_unfollow_screen(self):
@@ -371,9 +365,9 @@ class Driver(object):
     def check_follows(self):
         try:
             sections = self.browser.find_elements_by_xpath(Config.sections_xpath)
-            print(str(len(sections)) + " Sections found.")
-        except:
-            print("Sections not found.")
+        except Exception as e:
+            self.mailer.send("Exception in check_follows: "+str(e)[:100])
+            Log.update(text="Exception in check_follows: "+str(e))
             return
         users = []
         for element in sections:
@@ -383,13 +377,13 @@ class Driver(object):
         for user in users:
             if user not in self.interacting_users:
                 if user not in self.actionList.keys():
-                    self.mailer.send(
-                        "New interaction discovered with: " + user + ", but we have no further information.")
+                    self.mailer.send("New interaction discovered with: "+user+", but we have no further information.")
+                    Log.update(text="New interaction discovered with: "+user+", but we have no further information.")
                     sleep(1)
                 else:
                     actions = self.actionList[user]
-                    self.mailer.send(
-                        "New interaction discovered with: " + user + ", and we have logged our interactions on him:")
+                    self.mailer.send("New interaction discovered with: "+user+", and we have logged our interactions on him:")
+                    Log.update(text="New interaction discovered with: "+user+", and we have logged our interactions on him:")
                     sleep(1)
                     string = ""
                     for action in actions:
@@ -397,6 +391,7 @@ class Driver(object):
                             "topic"] + " ... "
                         self.hashtags[action["topic"]] += 1
                     self.mailer.send(string)
+                    Log.update(text=string)
                     sleep(1)
                 self.interacting_users.append(user)
                 with open(Config.bot_path + "log/interacting_users.pickle", "wb") as userfile:
@@ -415,15 +410,31 @@ class Driver(object):
                         self.hashtags[h] = 0.01
             with open(Config.bot_path + "log/hashtags.pickle", "wb") as f:
                 pickle.dump(self.hashtags, f)
-        except:
+        except Exception as e:
             self.browser.save_screenshot(Config.bot_path + 'log/error.png')
-            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.store_hashtags')
-            pass
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Exception in self.store_hashtags: '+str(e)[:100])
+            Log.update(text='Exception in self.store_hashtags: '+str(e))
 
     def extract_hash_tags(self, s):
         return set(part[1:] for part in s.split() if part.startswith('#'))
 
-    # Coordinates every function in an endless loop
+    def extract_picture_source(self):
+        try:
+            sections = self.browser.find_elements_by_xpath(Config.image_div_container_xpath)
+            for section in sections:
+                image = section.find_element_by_tag_name("img")
+                return image.get_attribute("src")
+        except Exception as e:
+            self.browser.save_screenshot(Config.bot_path + 'log/error.png')
+            self.mailer.send_image(Config.bot_path + 'log/error.png', 'Picture could not be extracted: '+str(e)[:100])
+            Log.update(text='Picture could not be extracted: '+str(e))
+        return ""
+
+    def check_for_exit_command(self):
+        msg = self.mailer.get_current_message()
+        if msg == "Exit" or msg == "Pause" or msg == "Stop":
+            raise Exception("User ended the program by telegram message")
+
     def like_follow_loop(self):
         self.login()
         while True:
@@ -435,64 +446,52 @@ class Driver(object):
             for hashtag in top_hashtags:
                 top_hashtags_values.append(self.hashtags[hashtag])
             self.mailer.send_stats(top_hashtags_values, top_hashtags, caption="Top 20 hashtags")
-            low_hashtags = sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[-20:]
-            low_hashtags_values = []
-            for hashtag in low_hashtags:
-                low_hashtags_values.append(self.hashtags[hashtag])
-            self.mailer.send_stats(low_hashtags_values, low_hashtags, caption="Low 20 hashtags")
+
             sleep(1)
 
             for topic_selector in range(len(top_hashtags) - 1):
-                if (
-                                    self.mailer.get_current_message() == "Exit" or self.mailer.get_current_message() == "Pause" or self.mailer.get_current_message() == "Stop"):
-                    raise Exception('Breaking out of inner loop')
+                self.check_for_exit_command()
                 self.search(top_hashtags[topic_selector])
-                print("Selecting first picture.")
                 self.select_first()
                 if topic_selector % 7 == 2:
-                    if (
-                                        self.mailer.get_current_message() == "Exit" or self.mailer.get_current_message() == "Pause" or self.mailer.get_current_message() == "Stop"):
-                        raise Exception('Breaking out of inner loop')
+                    self.check_for_exit_command()
                     if not self.error():
                         self.comment(top_hashtags[topic_selector])
                         self.store_hashtags()
                         self.next_picture()
                 for likes in range(3):
+
                     sleep(1)
-                    if (
-                                        self.mailer.get_current_message() == "Exit" or self.mailer.get_current_message() == "Pause" or self.mailer.get_current_message() == "Stop"):
-                        raise Exception('Breaking out of inner loop')
+
+                    self.check_for_exit_command()
                     if not self.error():
                         self.like(top_hashtags[topic_selector])
                         self.store_hashtags()
                         self.next_picture()
                 for follows in range(3):
+
                     sleep(1)
+
                     if not self.error():
-                        if (
-                                            self.mailer.get_current_message() == "Exit" or self.mailer.get_current_message() == "Pause" or self.mailer.get_current_message() == "Stop"):
-                            raise Exception('Breaking out of inner loop')
+                        self.check_for_exit_command()
                         self.next_picture()
-                        count = 0
+
                         sleep(3)
+
+                        count = 0
                         while self.user_followed_already(self.author()) and count < 10:
-                            if (
-                                                self.mailer.get_current_message() == "Exit" or self.mailer.get_current_message() == "Pause" or self.mailer.get_current_message() == "Stop"):
-                                raise Exception('Breaking out of inner loop')
+                            self.check_for_exit_command()
                             self.mailer.send(self.author() + " was followed already. Skipping picture.")
-                            print(self.author() + " was followed already. Skipping picture.")
+                            Log.update(text=self.author() + " was followed already. Skipping picture.")
                             self.next_picture()
-                            count = count + 1
+                            count += 1
                             sleep(1)
                         self.follow(top_hashtags[topic_selector])
                         self.store_hashtags()
-                self.mailer.send("Accounts to unfollow: " + str(len(self.accounts_to_unfollow)))
-                print("Accounts to unfollow: " + str(len(self.accounts_to_unfollow)))
+
                 if len(self.accounts_to_unfollow) > 50:
                     for unfollows in range(3):
-                        if (
-                                            self.mailer.get_current_message() == "Exit" or self.mailer.get_current_message() == "Pause" or self.mailer.get_current_message() == "Stop"):
-                            raise Exception('Breaking out of inner loop')
+                        self.check_for_exit_command()
                         this_guy = self.accounts_to_unfollow[0]
                         self.unfollow(this_guy)
                         del self.accounts_to_unfollow[0]

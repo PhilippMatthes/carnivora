@@ -38,14 +38,12 @@ class Mailer:
                 pickle.dump(telepot_user_number, f)
             self.telepot_user_number = telepot_user_number
 
-    def send(self, text):
         self.bot = telepot.Bot(self.key)
-        Log.update(str(datetime.datetime.now()), text, "")
+
+    def send(self, text):
         self.bot.sendMessage(self.telepot_user_number, text)
 
     def send_image(self, image, caption):
-        self.bot = telepot.Bot(self.key)
-        Log.update(str(datetime.datetime.now()), caption, image)
         with open(image, 'rb') as f:
             self.bot.sendPhoto(self.telepot_user_number, f, caption)
 
@@ -65,7 +63,6 @@ class Mailer:
 
     def get_current_message(self):
         try:
-            self.bot = telepot.Bot(self.key)
             updates = self.bot.getUpdates()
             if len(updates) == 0:
                 return ""

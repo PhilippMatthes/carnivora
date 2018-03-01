@@ -20,7 +20,7 @@ class Config:
     start_url = "https://www.instagram.com/accounts/login/"
     following_link = "https://www.instagram.com/snrmtths/following/"
     account_url = "https://www.instagram.com/snrmtths/"
-    headless_is_available = True
+    headless_is_available = False
 
     # The following (xpath) classes need to be refreshed every now and then.
     # they define, where elements are located on Instagram.
@@ -44,6 +44,8 @@ class Config:
     next_button_xpath = "//*[contains(@class, '_3a693 coreSpriteRightPaginationArrow')]"
     like_button_xpath = "//*[contains(@class, '_8scx2 coreSpriteHeartOpen')]"
     like_button_full_xpath = "//*[contains(@class, '_8scx2 coreSpriteHeartFull')]"
+
+    image_div_container_xpath = "//div[contains(@class,'_sxolz')]"
 
     # Available comments: the first {} is replaced with the username
     # the second is replaced with a smiley. Note that UTF-8 smileys are only

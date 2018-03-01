@@ -6,11 +6,15 @@ if __name__ == "__main__":
     sys.path.append('../')
 
     print("Running instabot...")
-    subprocess.Popen(['python3', 'run_instabot.py'])
+    try:
+        p = subprocess.Popen(['python3', 'run_instabot.py'])
+    except EnvironmentError as e:  #
+        sys.exit('failed to start %r, reason: %s' % (executable, e))
 
     print("Launching server with the following work directories:")
     for path in sys.path:
         print("    "+path)
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carnivora.settings")
     try:
         from django.core.management import execute_from_command_line

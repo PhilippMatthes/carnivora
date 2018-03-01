@@ -1,3 +1,4 @@
+import datetime
 import pickle
 
 from carnivora.instabot.config import Config
@@ -9,7 +10,8 @@ class Log:
         pass
 
     @staticmethod
-    def update(date, text, image):
+    def update(text="", image=""):
+        date = str(datetime.datetime.now())
         log = []
         try:
             with open(Config.bot_path + "log/log.pickle", "rb") as f:
