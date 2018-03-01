@@ -1,7 +1,7 @@
 {% for line in lines %}
   <tr>
      <td>{{ line.0 }}</td>
-     <td>{{ line.1 }}</td>
+     <td style="word-wrap: break-word; max-width: 150px;">{{ line.1 }}</td>
      <td><img width="50" height="50" src={{ line.2 }}></td>
   </tr>
 {% endfor %}
