@@ -33,4 +33,4 @@ def hashtags_update(request):
     lines_truncated = []
     for hashtag, num in lines:
         lines_truncated.append((hashtag[:20], num))
-    return render(request, 'table_monitor_update.html', {'lines': lines_truncated})
+    return render(request, 'hashtags_update.html', {'lines': lines_truncated})

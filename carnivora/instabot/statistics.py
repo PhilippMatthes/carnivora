@@ -7,7 +7,6 @@ from carnivora.instabot.config import Config
 class Statistics:
     @staticmethod
     def get_hashtags():
-        print("Get hashtags")
         hashtags = {}
         try:
             with open(Config.bot_path + "log/hashtags.pickle", "rb") as f:
