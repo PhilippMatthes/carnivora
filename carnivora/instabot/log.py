@@ -4,6 +4,10 @@ from carnivora.instabot.config import Config
 
 
 class Log:
+
+    def __init__(self):
+        pass
+
     @staticmethod
     def update(date, text, image):
         log = []

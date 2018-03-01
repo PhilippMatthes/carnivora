@@ -1,9 +1,16 @@
 import os
 import sys
-
+import subprocess
 
 if __name__ == "__main__":
-    print(sys.path)
+    sys.path.append('../')
+
+    print("Running instabot...")
+    subprocess.Popen(['python3', 'run_instabot.py'])
+
+    print("Launching server with the following work directories:")
+    for path in sys.path:
+        print("    "+path)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carnivora.settings")
     try:
         from django.core.management import execute_from_command_line
