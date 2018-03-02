@@ -64,11 +64,11 @@ class Config:
     bot_path = config["bot_path"]
 
     topics = config["topics"]
-    delay = config["delay"]
+    delay = float(config["delay"])
     start_url = config["start_url"]
     following_link = config["following_link"]
     account_url = config["account_url"]
-    headless_is_available = config["headless_is_available"]
+    headless_is_available = bool(config["headless_is_available"])
 
     sections_xpath = config["sections_xpath"]
     local_name_xpath = config["local_name_xpath"]
