@@ -17,17 +17,21 @@
 
 <div class="ui pointing menu">
     <a class="active item" id="monitor" onclick="request('/monitor/'); toggle('monitor')">Monitor</a>
-    <a class="item" id="followed_users" onclick="request('/followed_users/'); toggle('followed_users')">Followed Users</a>
     <a class="item" id="hashtags" onclick="request('/hashtags/'); toggle('hashtags')">Hashtags</a>
     <a class="item" id="settings" onclick="request('/settings/'); toggle('settings')">Settings</a>
 </div>
 <div class="ui bottom attached segment">
+  <div class="ui active inverted dimmer" id="dimmer">
+    <div class="ui text loader" id="loader">Loading</div>
+  </div>
   <p id="ajax-replace"></p>
 </div>
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script>
     function request(url) {
+        document.getElementById("dimmer").style.visibility = 'visible';
+        document.getElementById("loader").style.visibility = 'visible';
         // Set a fake timeout to get the highest timeout id
         var highestTimeoutId = setTimeout(";");
         for (var i = 0 ; i < highestTimeoutId ; i++) {
@@ -39,6 +43,8 @@
         })
         .done(function(response) {
             $('#ajax-replace').html(response);
+            document.getElementById("dimmer").style.visibility = 'hidden';
+            document.getElementById("loader").style.visibility = 'hidden';
         })
     }
     request('/monitor/')

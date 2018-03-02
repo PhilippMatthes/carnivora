@@ -1,1 +1,29 @@
-<div>Settings</div>
+{% for tuple in sorted_config %}
+    <div class="ui labeled fluid input" style="padding: 8px;">
+        <div class="ui label">{{ tuple.0 }}</div>
+        <input type="text" value="{{ tuple.1 }}" id="{{ tuple.0 }}">
+        <button class="ui button"
+                style="margin-left: 8px;"
+                id="{{ tuple.0 }}-button"
+                onclick="submit_to_config('{{ tuple.0 }}', '{{ tuple.0 }}')">
+            Submit
+        </button>
+    </div>
+{% endfor %}
+
+<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
+<script>
+function submit_to_config(config_key, input_id) {
+    document.getElementById(input_id+"-button").className = "ui loading button";
+    var config_param = document.getElementById(input_id).value;
+    $.ajax({
+        type: "GET",
+        url: {% url 'submit_to_config' %},
+        data: {'config_key': config_key, 'config_param': config_param}
+    })
+    .done(function(response) {
+        document.getElementById(input_id+"-button").className = "ui button";
+        $('#'+input_id).replaceWith(response);
+    })
+}
+</script>

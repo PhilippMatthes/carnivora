@@ -2,7 +2,7 @@
     <tr>
         <td>{{ line.0 }}</td>
         <td style="word-wrap: break-word;">{{ line.1 }}</td>
-        {% if line.2 != "" %}
+        {% if line.2 != "" and line.2 != None %}
             <td><img width="50" height="50" src={{ line.2 }}></td>
         {% else %}
             <td></td>
