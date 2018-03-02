@@ -29,5 +29,4 @@ urlpatterns = [
     url(r'^hashtags/$', views.hashtags, name="hashtags"),
     url(r'^followed_users/$', views.followed_users, name="followed_users"),
     url(r'^settings/$', views.settings, name="settings"),
-    url(r'^hashtags_update/$', views.hashtags_update, name="hashtags_update"),
 ]

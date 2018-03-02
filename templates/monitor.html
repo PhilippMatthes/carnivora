@@ -1,9 +1,11 @@
-<table id="auto-updating-monitor" class="ui table">
+<table class="ui table">
+    <button class="ui loading button" id="loading-button" onclick="switch_updates()">Start updating monitor</button>
     <thead>
         <th>Date</th>
         <th style="word-wrap: break-word; max-width: 150px;">Description</th>
         <th>Image</th>
     </thead>
+    <tbody id="auto-updating-monitor"></tbody>
 </table>
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
@@ -14,9 +16,21 @@ function get_monitor_updates() {
         url: {% url 'table_monitor_update' %}
     })
     .done(function(response) {
-        $('#auto-updating-monitor').prepend(response);
+        $('#auto-updating-monitor').html(response);
     })
 }
-setInterval(get_monitor_updates, 10000)
 
+var interval_id = setInterval(get_monitor_updates, 10000);
+var is_updating = true;
+
+function switch_updates() {
+    if (is_updating) {
+        document.getElementById('loading-button').className = "ui button";
+        clearInterval(interval_id);
+    } else {
+        document.getElementById('loading-button').className = "ui loading button";
+        interval_id = setInterval(get_monitor_updates, 10000);
+    }
+    is_updating = !is_updating;
+}
 </script>

@@ -3,17 +3,19 @@
 
 {% load static %}
 
+<link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}"/>
+
 <head>
-    <link rel='stylesheet' type='text/css' href="{% static '/css/Semantic-UI-CSS-master/semantic.css' %}" />
-    <link rel='stylesheet' type='text/css' href="{% static '/css/gradient-background.css' %}" />
+    <link rel='stylesheet' type='text/css' href="{% static '/css/Semantic-UI-CSS-master/semantic.css' %}"/>
+    <link rel='stylesheet' type='text/css' href="{% static '/css/gradient-background.css' %}"/>
     <meta charset="UTF-8">
-    <title>carnivora</title>
-    <meta name="author" content="Philipp Matthes" />
+    <title>Carnivora</title>
+    <meta name="author" content="Philipp Matthes"/>
 </head>
 
 <body class="gradient-background">
 
-<div class="ui top attached tabular menu">
+<div class="ui pointing menu">
     <a class="active item" id="monitor" onclick="request('/monitor/'); toggle('monitor')">Monitor</a>
     <a class="item" id="followed_users" onclick="request('/followed_users/'); toggle('followed_users')">Followed Users</a>
     <a class="item" id="hashtags" onclick="request('/hashtags/'); toggle('hashtags')">Hashtags</a>
@@ -26,6 +28,11 @@
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script>
     function request(url) {
+        // Set a fake timeout to get the highest timeout id
+        var highestTimeoutId = setTimeout(";");
+        for (var i = 0 ; i < highestTimeoutId ; i++) {
+            clearTimeout(i);
+        }
         $.ajax({
             type: "GET",
             url: url

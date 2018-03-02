@@ -4,12 +4,14 @@ import os
 import sys
 import subprocess
 
+from carnivora.instabot.config import Config
+
 if __name__ == "__main__":
     sys.path.append('../')
 
     print("Running instabot...")
     try:
-        p = subprocess.Popen(['/home/pi/tensorflow/bin/python3', 'run_instabot.py'])
+        p = subprocess.Popen([Config.pypath, 'run_instabot.py'])
     except EnvironmentError as e:  #
         sys.exit('Failed to start subprocess.')
 

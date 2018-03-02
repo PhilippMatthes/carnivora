@@ -1,20 +1,28 @@
-<table id="hashtags-table" class="ui table">
-    <thead>
-        <th>Hashtag</th>
-        <th>Score</th>
-    </thead>
-</table>
+<canvas id="hashtags-chart"></canvas>
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
+<script src="static/js/chartjs/Chart.js"></script>
+
 <script>
-function get_monitor_updates() {
-    $.ajax({
-        type: "GET",
-        url: {% url 'hashtags_update' %}
-    })
-    .done(function(response) {
-        $('#hashtags-table').append(response);
-    })
-}
-get_monitor_updates()
+var ctx = document.getElementById("hashtags-chart").getContext('2d');
+var chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ hashtag_names|safe }},
+        datasets: [{
+            label: 'Hashtag score',
+            data: {{ hashtag_scores }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
 </script>
