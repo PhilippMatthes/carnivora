@@ -10,7 +10,7 @@ def index(request):
 
 
 def table_monitor_update(request):
-    lines = Log.get()
+    lines = Log.get(20)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
 

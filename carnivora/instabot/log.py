@@ -23,14 +23,12 @@ class Log:
             pickle.dump(log, f)
 
     @staticmethod
-    def get():
+    def get(n):
         log = []
         try:
             with open(Config.bot_path + "log/log.pickle", "rb") as f:
                 log = pickle.load(f)
         except:
             pass
-        with open(Config.bot_path + "log/log.pickle", "wb") as f:
-            pickle.dump([], f)
-        return log
+        return reversed(log[-n:])
 
