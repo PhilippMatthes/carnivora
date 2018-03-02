@@ -495,15 +495,15 @@ class Driver(object):
 
                         count = 0
                         while self.user_followed_already(self.author()) and count < 10:
-                            if self.post_is_sfw():
-                                self.check_for_exit_command()
-                                self.mailer.send(self.author() + " was followed already. Skipping picture.")
-                                Log.update(text=self.author() + " was followed already. Skipping picture.")
+                            self.check_for_exit_command()
+                            self.mailer.send(self.author() + " was followed already. Skipping picture.")
+                            Log.update(text=self.author() + " was followed already. Skipping picture.")
                             self.next_picture()
                             count += 1
                             sleep(1)
-                        self.follow(top_hashtags[topic_selector])
-                        self.store_hashtags()
+                        if self.post_is_sfw():
+                            self.follow(top_hashtags[topic_selector])
+                            self.store_hashtags()
 
                 if len(self.accounts_to_unfollow) > 50:
                     for unfollows in range(3):

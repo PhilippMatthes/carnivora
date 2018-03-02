@@ -32,8 +32,8 @@ def hashtags(request):
     hashtags = Statistics.get_hashtags()
     hashtag_names = []
     hashtag_scores = []
-    for hashtag_name, hashtag_score in hashtags[:20]:
-        hashtag_names.append(hashtag_name[:20])
+    for hashtag_name, hashtag_score in hashtags[:40]:
+        hashtag_names.append(hashtag_name[:40])
         hashtag_scores.append(hashtag_score)
     return render(request, 'hashtags.html', {'hashtag_names': json.dumps(hashtag_names),
                                              'hashtag_scores': hashtag_scores})
