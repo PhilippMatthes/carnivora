@@ -6,7 +6,7 @@
         $.ajax({
             type: "GET",
             url: '/perform_reboot/'
-        })
+        });
         $('#status').html('Performing reboot...');
         request('/reboot/');
     }
