@@ -27,6 +27,6 @@ urlpatterns = [
     url(r'^table_monitor_update/$', views.table_monitor_update, name="table_monitor_update"),
     url(r'^submit_to_config/$', views.submit_to_config, name="submit_to_config"),
     url(r'^monitor/$', views.monitor, name="monitor"),
-    url(r'^hashtags/$', views.hashtags, name="hashtags"),
+    url(r'^statistics/$', views.statistics, name="statistics"),
     url(r'^settings/$', views.settings, name="settings"),
 ]

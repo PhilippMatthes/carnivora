@@ -29,15 +29,18 @@ def monitor(request):
     return render(request, 'monitor.html', {'lines': lines})
 
 
-def hashtags(request):
+def statistics(request):
     hashtags = Statistics.get_hashtags()
     hashtag_names = []
     hashtag_scores = []
     for hashtag_name, hashtag_score in hashtags[:40]:
         hashtag_names.append(hashtag_name[:40])
         hashtag_scores.append(hashtag_score)
-    return render(request, 'hashtags.html', {'hashtag_names': json.dumps(hashtag_names),
-                                             'hashtag_scores': hashtag_scores})
+    render_data = {
+        'hashtag_names': json.dumps(hashtag_names),
+        'hashtag_scores': hashtag_scores,
+    }
+    return render(request, 'statistics.html', render_data)
 
 
 def settings(request):
