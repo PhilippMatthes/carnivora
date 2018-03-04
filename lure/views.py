@@ -44,8 +44,8 @@ def statistics(request):
     return render(request, 'statistics.html', render_data)
 
 
-def reboot(request):
-    return render(request, 'reboot.html')
+def server(request):
+    return render(request, 'server.html')
 
 
 def perform_reboot(request):
