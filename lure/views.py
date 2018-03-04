@@ -25,7 +25,8 @@ def submit_to_config(request):
 
 
 def monitor(request):
-    return render(request, 'monitor.html')
+    lines = Log.get(20)
+    return render(request, 'monitor.html', {'lines': lines})
 
 
 def hashtags(request):

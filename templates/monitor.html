@@ -5,7 +5,19 @@
         <th style="word-wrap: break-word; max-width: 150px;">Description</th>
         <th>Image</th>
     </thead>
-    <tbody id="auto-updating-monitor"></tbody>
+    <tbody id="auto-updating-monitor">
+    {% for line in lines %}
+    <tr>
+        <td>{{ line.0 }}</td>
+        <td style="word-wrap: break-word;">{{ line.1 }}</td>
+        {% if line.2 != "" and line.2 != None %}
+            <td><img width="50" height="50" src={{ line.2 }}></td>
+        {% else %}
+            <td></td>
+        {% endif %}
+    </tr>
+{% endfor %}
+    </tbody>
 </table>
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
