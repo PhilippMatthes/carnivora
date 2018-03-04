@@ -8,6 +8,7 @@
             url: '/perform_reboot/'
         });
         $('#status').html('Performing reboot...');
-        request('/server/');
     }
+    // Set new interval
+    setTimeout(function() { request('/server/'); }, 5000);
 </script>

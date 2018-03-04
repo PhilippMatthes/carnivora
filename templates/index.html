@@ -20,7 +20,7 @@
     <a class="item" id="statistics" onclick="request('/statistics/'); toggle('statistics')">Statistics</a>
     <a class="item" id="settings" onclick="request('/settings/'); toggle('settings')">Settings</a>
     <div class="right menu">
-      <a class="item" id="reboot" onclick="request('/reboot/'); toggle('reboot')">Reboot Server</a>
+      <a class="item" id="server" onclick="request('/server/'); toggle('server')">Server</a>
     </div>
 </div>
 <div class="ui bottom attached segment">
@@ -32,9 +32,18 @@
 
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script>
-    function request(url) {
+    function show_loading_indicator() {
         document.getElementById("dimmer").style.visibility = 'visible';
         document.getElementById("loader").style.visibility = 'visible';
+    }
+
+    function hide_loading_indicator() {
+        document.getElementById("dimmer").style.visibility = 'hidden';
+        document.getElementById("loader").style.visibility = 'hidden';
+    }
+
+    function request(url) {
+        var timeout = setTimeout(show_loading_indicator(), 500);
         // Set a fake timeout to get the highest timeout id
         var highestTimeoutId = setTimeout(";");
         for (var i = 0 ; i < highestTimeoutId ; i++) {
@@ -46,8 +55,8 @@
         })
         .done(function(response) {
             $('#ajax-replace').html(response);
-            document.getElementById("dimmer").style.visibility = 'hidden';
-            document.getElementById("loader").style.visibility = 'hidden';
+            clearTimeout(timeout);
+            hide_loading_indicator()
         })
     }
     request('/monitor/')
