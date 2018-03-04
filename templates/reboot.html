@@ -1,0 +1,13 @@
+<button class="ui fluid button" id="status" onclick="perform_reboot()">Reboot server now</button>
+
+<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
+<script>
+    function perform_reboot() {
+        $.ajax({
+            type: "GET",
+            url: '/perform_reboot/'
+        })
+        $('#status').html('Performing reboot...');
+        request('/reboot/');
+    }
+</script>

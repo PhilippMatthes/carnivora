@@ -1,5 +1,6 @@
 import json
 import operator
+import os
 
 from django.shortcuts import render, render_to_response
 
@@ -41,6 +42,14 @@ def statistics(request):
         'hashtag_scores': hashtag_scores,
     }
     return render(request, 'statistics.html', render_data)
+
+
+def reboot(request):
+    return render(request, 'reboot.html')
+
+
+def perform_reboot(request):
+    os.system('sudo reboot now')
 
 
 def settings(request):
