@@ -32,8 +32,9 @@ def monitor(request):
 
 def statistics(request):
     hashtag_names, hashtag_scores = Statistics.get_hashtags(n=40, truncated_name_length=20)
-    amount_of_users, amount_of_interactions, amount_of_likes, _, amount_of_comments = Statistics.get_amount_of_actions()
-    amount_of_follows = Statistics.get_amount_of_followed_accounts()
+    amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments\
+        = Statistics.get_amount_of_actions()
+    amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts()
     render_data = {
         'hashtag_names': json.dumps(hashtag_names),
         'hashtag_scores': hashtag_scores,
@@ -42,6 +43,7 @@ def statistics(request):
         'amount_of_comments': amount_of_comments,
         'amount_of_follows': amount_of_follows,
         'amount_of_interactions': amount_of_interactions,
+        'amount_of_follows_all_time': amount_of_follows_all_time,
     }
     return render(request, 'statistics.html', render_data)
 
