@@ -31,4 +31,6 @@ urlpatterns = [
     url(r'^monitor/$', views.monitor, name="monitor"),
     url(r'^statistics/$', views.statistics, name="statistics"),
     url(r'^settings/$', views.settings, name="settings"),
+    url(r'^nsfw-check/$', views.nsfw_check, name="nsfw-check"),
+    url(r'^submit_to_nsfw/$', views.submit_nsfw, name="submit_to_nsfw"),
 ]

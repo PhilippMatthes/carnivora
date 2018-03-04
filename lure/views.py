@@ -7,6 +7,7 @@ from django.shortcuts import render, render_to_response
 from carnivora.instabot.config import ConfigLoader
 from carnivora.instabot.log import Log
 from carnivora.instabot.statistics import Statistics
+from tf_open_nsfw.classify_nsfw import classify_nsfw
 
 
 def index(request):
@@ -47,9 +48,18 @@ def statistics(request):
     }
     return render(request, 'statistics.html', render_data)
 
+def submit_nsfw(request):
+    link = request.GET['nsfw_link']
+    sfw, nsfw = classify_nsfw(link)
+    return render(request, 'nsfw_progress_bar.html', {'nsfw': nsfw})
+
 
 def server(request):
     return render(request, 'server.html')
+
+
+def nsfw_check(request):
+    return render(request, 'nsfw_check.html')
 
 
 def perform_reboot(request):

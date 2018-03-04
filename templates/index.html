@@ -18,12 +18,17 @@
     <meta name="author" content="Philipp Matthes"/>
 </head>
 
+<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
+<script src="static/js/chartjs/Chart.js"></script>
+<script src="static/css/Semantic-UI-CSS-master/semantic.js"></script>
+
 <body class="gradient-background">
 
 <div class="ui pointing menu">
     <a class="active item" id="monitor" onclick="request('/monitor/'); toggle('monitor')">Monitor</a>
     <a class="item" id="statistics" onclick="request('/statistics/'); toggle('statistics')">Statistics</a>
     <a class="item" id="settings" onclick="request('/settings/'); toggle('settings')">Settings</a>
+    <a class="item" id="nsfw-check" onclick="request('/nsfw-check/'); toggle('nsfw-check')">NSFW Check</a>
     <div class="right menu">
       <a class="item" id="server" onclick="request('/server/'); toggle('server')">Server</a>
     </div>

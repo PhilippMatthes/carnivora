@@ -2,52 +2,47 @@
 
 <canvas id="hashtags-chart"></canvas>
 
-<div class="ui big olive progress" data-value="{{ amount_of_interactions }}" data-total="{{ amount_of_interactions }}" id="interactions">
+<div class="ui large olive progress" data-value="{{ amount_of_interactions }}" data-total="{{ amount_of_interactions }}" id="interactions">
   <div class="bar">
       <div class="progress"></div>
   </div>
   <div class="label">Total interactions</div>
 </div>
 
-<div class="ui big green progress" data-value="{{ amount_of_users }}" data-total="{{ amount_of_interactions }}" id="users">
+<div class="ui large green progress" data-value="{{ amount_of_users }}" data-total="{{ amount_of_interactions }}" id="users">
   <div class="bar">
       <div class="progress"></div>
   </div>
   <div class="label">Users we interacted with</div>
 </div>
 
-<div class="ui big teal progress" data-value="{{ amount_of_likes }}" data-total="{{ amount_of_interactions }}" id="likes">
+<div class="ui large teal progress" data-value="{{ amount_of_likes }}" data-total="{{ amount_of_interactions }}" id="likes">
   <div class="bar">
       <div class="progress"></div>
   </div>
   <div class="label">Likes on posts</div>
 </div>
 
-<div class="ui big blue progress" data-value="{{ amount_of_follows }}" data-total="{{ amount_of_interactions }}" id="follows">
+<div class="ui large blue progress" data-value="{{ amount_of_follows }}" data-total="{{ amount_of_interactions }}" id="follows">
   <div class="bar">
       <div class="progress"></div>
   </div>
   <div class="label">Followed users</div>
 </div>
 
-<div class="ui big violet progress" data-value="{{ amount_of_comments }}" data-total="{{ amount_of_interactions }}" id="comments">
+<div class="ui large violet progress" data-value="{{ amount_of_comments }}" data-total="{{ amount_of_interactions }}" id="comments">
   <div class="bar">
       <div class="progress"></div>
   </div>
   <div class="label">Comments on posts</div>
 </div>
 
-<div class="ui big violet progress" data-value="{{ amount_of_follows_all_time }}" data-total="{{ amount_of_follows_all_time }}" id="follows-alltime">
+<div class="ui large violet progress" data-value="{{ amount_of_follows_all_time }}" data-total="{{ amount_of_follows_all_time }}" id="follows-alltime">
   <div class="bar">
       <div class="progress"></div>
   </div>
   <div class="label">Follows since the first start of this bot</div>
 </div>
-
-
-<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
-<script src="static/js/chartjs/Chart.js"></script>
-<script src="static/css/Semantic-UI-CSS-master/semantic.js"></script>
 
 <script>
 var ctx = document.getElementById("hashtags-chart").getContext('2d');

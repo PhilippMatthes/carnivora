@@ -11,7 +11,6 @@
     </div>
 {% endfor %}
 
-<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script>
 function submit_to_config(config_key, input_id) {
     document.getElementById(input_id+"-button").className = "ui loading button";
@@ -24,6 +23,6 @@ function submit_to_config(config_key, input_id) {
     .done(function(response) {
         document.getElementById(input_id+"-button").className = "ui button";
         $('#'+input_id).replaceWith(response);
-    })
+    });
 }
 </script>
