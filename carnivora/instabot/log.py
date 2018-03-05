@@ -23,12 +23,21 @@ class Log:
             pickle.dump(log, f)
 
     @staticmethod
-    def get(n):
+    def get(n, offset=0):
         log = []
         try:
             with open(Config.bot_path + "log/log.pickle", "rb") as f:
                 log = pickle.load(f)
         except:
             pass
-        return reversed(log[-n:])
+        return reversed(log[-n:-offset])
+
+    @staticmethod
+    def number_of_pages(page_size):
+        try:
+            with open(Config.bot_path + "log/log.pickle", "rb") as f:
+                log = pickle.load(f)
+        except:
+            pass
+        return int(len(log)/page_size)
 

@@ -9,13 +9,16 @@ from carnivora.instabot.log import Log
 from carnivora.instabot.statistics import Statistics
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
+page_size = 20
+
 
 def index(request):
     return render_to_response('index.html')
 
 
 def table_monitor_update(request):
-    lines = Log.get(20)
+    # pages = range(Log.number_of_pages(page_size=page_size))
+    lines = Log.get(page_size)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
 
@@ -27,7 +30,8 @@ def submit_to_config(request):
 
 
 def monitor(request):
-    lines = Log.get(20)
+    # pages = range(Log.number_of_pages(page_size=page_size))
+    lines = Log.get(page_size)
     return render(request, 'monitor.html', {'lines': lines})
 
 
@@ -47,6 +51,7 @@ def statistics(request):
         'amount_of_follows_all_time': amount_of_follows_all_time,
     }
     return render(request, 'statistics.html', render_data)
+
 
 def submit_nsfw(request):
     link = request.GET['nsfw_link']
