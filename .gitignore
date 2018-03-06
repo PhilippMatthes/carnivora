@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+tensorflow-1.1.0-cp34-cp34m-linux_armv7l.whl
+
 ## Ignore all IntelliJ files
 *.iml
 .idea/
