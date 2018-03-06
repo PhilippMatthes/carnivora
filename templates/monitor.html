@@ -1,6 +1,6 @@
 <div class="ui form">
     <div class="inline fields">
-        <button class="ui loading button" id="loading-button" onclick="switch_updates()">Start updating monitor</button>
+        <button class="ui loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
         <div class="field" style="padding-left: 8px">
             <div class="ui icon input">
                 <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
@@ -50,9 +50,11 @@ function get_monitor_updates() {
 function switch_updates() {
     if (is_updating) {
         document.getElementById('loading-button').className = "ui button";
+        document.getElementById('loading-button').textContent = "Start updating monitor";
         clearInterval(interval_id);
     } else {
         document.getElementById('loading-button').className = "ui loading button";
+        document.getElementById('loading-button').textContent = "Upd.";
         interval_id = setInterval(get_monitor_updates, 10000);
     }
     is_updating = !is_updating;
