@@ -186,7 +186,7 @@ def submit_nsfw(request):
     try:
         link = request.GET['nsfw_link']
         sfw, nsfw = classify_nsfw(link)
-        return render(request, 'nsfw_progress_bar.html', {'nsfw': nsfw})
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': nsfw*100})
     except MultiValueDictKeyError as e:
         print(e)
         return render(request, 'nsfw_progress_bar.html', {'nsfw': 0.0})
