@@ -3,6 +3,15 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+accounts_to_unfollow.pickle
+action_list.pickle
+followed_users_all_time.pickle
+hashtags.pickle
+interacting_users.pickle
+log.pickle
+running.pickle
+config.pickle
+
 tensorflow-1.1.0-cp34-cp34m-linux_armv7l.whl
 
 ## Ignore all IntelliJ files
