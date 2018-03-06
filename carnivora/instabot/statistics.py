@@ -5,10 +5,10 @@ from carnivora.instabot.config import Config
 
 class Statistics:
     @staticmethod
-    def get_hashtags(n=40, truncated_name_length=100):
+    def get_hashtags(username, n=40, truncated_name_length=100):
         hashtags = {}
         try:
-            with open(Config.bot_path + "log/hashtags.pickle", "rb") as f:
+            with open(Config.bot_path + username + "/log/hashtags.pickle", "rb") as f:
                 hashtags = pickle.load(f)
         except:
             for h in Config.topics:
@@ -22,20 +22,20 @@ class Statistics:
         return hashtag_names, hashtag_scores
 
     @staticmethod
-    def get_amount_of_followed_accounts():
+    def get_amount_of_followed_accounts(username):
         followed_accounts = {}
         try:
-            with open(Config.bot_path + "log/followed_users_all_time.pickle", "rb") as f:
+            with open(Config.bot_path + username + "/log/followed_users_all_time.pickle", "rb") as f:
                 followed_accounts = pickle.load(f)
         except:
             pass
         return len(followed_accounts.values())
 
     @staticmethod
-    def get_amount_of_actions():
+    def get_amount_of_actions(username):
         action_list = {}
         try:
-            with open(Config.bot_path + "log/actionList.pickle", "rb") as f:
+            with open(Config.bot_path + username + "/log/actionList.pickle", "rb") as f:
                 action_list = pickle.load(f)
         except:
             pass
