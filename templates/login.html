@@ -1,0 +1,49 @@
+<div id="auth">
+<div class="ui middle aligned center aligned grid" style="padding-top: 160px;">
+    <div class="column six wide">
+        <h2 class="ui image header" style="color: #FFF;">
+            <img src="static/icon/carnivorous-plant-flat.png" class="image">
+                <div class="content">
+                Welcome to Carnivora
+                </div>
+        </h2>
+        <form class="ui large form" style="padding-top: 8px;">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui input">
+                        <input type="text" name="username" id="username" placeholder="Username">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui input">
+                        <input type="password" name="password" id="password" placeholder="Password">
+                    </div>
+                </div>
+                <div class="ui fluid large green submit button" onclick="submit_login()">Login</div>
+            </div>
+            <div class="ui error message"></div>
+        </form>
+
+        {% if message %}
+        <div class="ui message">
+            {{ message }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<script>
+    function submit_login() {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        $.ajax({
+                type: "GET",
+                url: {% url 'login_user' %},
+                data: {'username': username, 'password': password}
+            })
+            .done(function(response) {
+                $('#auth').replaceWith(response);
+            })
+    }
+</script>

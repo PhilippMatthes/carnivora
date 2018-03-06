@@ -21,67 +21,18 @@
 <script src="static/js/jquery/jquery-3.3.1.min.js"></script>
 <script src="static/js/chartjs/Chart.js"></script>
 
-<body class="gradient-background">
-
-<div class="ui pointing menu">
-    <a class="active item" id="monitor" onclick="request('/monitor/'); toggle('monitor')">Monitor</a>
-    <a class="item" id="statistics" onclick="request('/statistics/'); toggle('statistics')">Statistics</a>
-    <a class="item" id="settings" onclick="request('/settings/'); toggle('settings')">Settings</a>
-    <a class="item" id="nsfw-check" onclick="request('/nsfw-check/'); toggle('nsfw-check')">NSFW Check</a>
-    <div class="right menu">
-      <a class="item" id="server" onclick="request('/server/'); toggle('server')">Server</a>
-    </div>
-</div>
-<div class="ui bottom attached segment">
-  <div class="ui active inverted dimmer" id="dimmer">
-    <div class="ui text loader" id="loader">Loading</div>
-  </div>
-  <p id="ajax-replace"></p>
-</div>
-
-<script src="static/js/jquery/jquery-3.3.1.min.js"></script>
-<script>
-    function show_loading_indicator() {
-        document.getElementById("dimmer").style.visibility = 'visible';
-        document.getElementById("loader").style.visibility = 'visible';
-    }
-
-    function hide_loading_indicator() {
-        document.getElementById("dimmer").style.visibility = 'hidden';
-        document.getElementById("loader").style.visibility = 'hidden';
-    }
-
-    function request(url) {
-        var timeout = setTimeout(show_loading_indicator(), 500);
-        // Set a fake timeout to get the highest timeout id
-        var highestTimeoutId = setTimeout(";");
-        for (var i = 0 ; i < highestTimeoutId ; i++) {
-            clearTimeout(i);
-        }
-        $.ajax({
-            type: "GET",
-            url: url
-        })
-        .done(function(response) {
-            $('#ajax-replace').html(response);
-            clearTimeout(timeout);
-            hide_loading_indicator();
-        })
-    }
-    request('/monitor/')
-</script>
-
-<script>
-    function toggle(id) {
-        var x = document.getElementsByClassName("active item");
-        var i;
-        for (i = 0; i < x.length; i++) {
-            x[i].className = "item";
-        }
-        document.getElementById(id).className = "active item";
-    }
-</script>
-
+<body id="main-body" class="gradient-background">
 
 </body>
+
+<script>
+    $.ajax({
+            type: "GET",
+            url: {% url 'main_body' %}
+        })
+        .done(function(response) {
+            $('#main-body').html(response);
+        })
+</script>
+
 </html>

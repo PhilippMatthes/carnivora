@@ -37,13 +37,6 @@
   <div class="label">Comments on posts</div>
 </div>
 
-<div class="ui large violet progress" data-value="{{ amount_of_follows_all_time }}" data-total="{{ amount_of_follows_all_time }}" id="follows-alltime">
-  <div class="bar">
-      <div class="progress"></div>
-  </div>
-  <div class="label">Follows since the first start of this bot</div>
-</div>
-
 <script>
 var ctx = document.getElementById("hashtags-chart").getContext('2d');
 var chart = new Chart(ctx, {
@@ -94,12 +87,6 @@ var chart = new Chart(ctx, {
         }
     });
     $('#follows').progress({
-        label: 'ratio',
-        text: {
-            ratio: '{value}'
-        }
-    });
-    $('#follows-alltime').progress({
         label: 'ratio',
         text: {
             ratio: '{value}'

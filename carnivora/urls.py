@@ -24,6 +24,8 @@ import lure.views as views
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^main_body/$', views.main_body, name='main_body'),
+    url(r'^login_user/$', views.login_user, name='login_user'),
     url(r'^table_monitor_update/$', views.table_monitor_update, name="table_monitor_update"),
     url(r'^submit_to_config/$', views.submit_to_config, name="submit_to_config"),
     url(r'^server/$', views.server, name="server"),

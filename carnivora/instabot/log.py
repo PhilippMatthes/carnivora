@@ -27,7 +27,6 @@ class Log:
         except:
             pass
         truncated_log = reversed(log[-n:])
-        print(search)
         if search == '' or search is None:
             return truncated_log
         else:

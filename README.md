@@ -15,6 +15,9 @@ Carnivora uses the following libraries:
 - urllib3
 - telepot
 
+## Creating a superuser
+Before you can use the server, you must create a superuser. Type in `python manage.py createsuperuser` and follow the instructions.
+
 ### Controlling the bot via Telegram
 
 ```
