@@ -16,15 +16,17 @@ function stop_instabot() {
 </script>
 {% else %}
 <div class="field">
-    <input type="password" placeholder="Instagram password" id="password">
     <button class="ui green button" onclick="run_instabot()">Run Bot</button>
+    <input type="text" placeholder="Instagram username" id="username">
+    <input type="password" placeholder="Instagram password" id="password">
 <script>
 function run_instabot() {
     var password = document.getElementById('password').value;
+    var username = document.getElementById('username').value;
     $.ajax({
         type: "GET",
         url: {% url 'run_instabot' %},
-        data: {'password': password}
+        data: {'password': password, 'username': username}
     })
     .done(function(response) {
         $('#button-chain').replaceWith(response);

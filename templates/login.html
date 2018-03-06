@@ -21,16 +21,17 @@
                 </div>
                 <div class="ui fluid large green submit button" onclick="submit_login()">Login</div>
             </div>
-            <div class="ui error message"></div>
+            {% if message %}
+            <div class="ui error message">
+                {{ message }}
+            </div>
+            {% endif %}
         </form>
 
-        {% if message %}
         <div class="ui message">
-            {{ message }}
+            <button id="register" class="ui button" onclick="load_registration()">Register instead</button>
         </div>
-        {% endif %}
     </div>
-</div>
 </div>
 
 <script>
@@ -46,4 +47,18 @@
                 $('#auth').replaceWith(response);
             })
     }
+    function load_registration() {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        $.ajax({
+                type: "GET",
+                url: {% url 'load_registration' %},
+                data: {'username': username, 'password': password}
+            })
+            .done(function(response) {
+                $('#auth').replaceWith(response);
+            })
+    }
 </script>
+
+</div>

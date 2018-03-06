@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', index, name='index'),
     url(r'^main_body/$', views.main_body, name='main_body'),
     url(r'^login_user/$', views.login_user, name='login_user'),
+    url(r'^register_user/$', views.register_user, name='register_user'),
     url(r'^table_monitor_update/$', views.table_monitor_update, name="table_monitor_update"),
     url(r'^submit_to_config/$', views.submit_to_config, name="submit_to_config"),
     url(r'^server/$', views.server, name="server"),
@@ -39,4 +40,5 @@ urlpatterns = [
     url(r'^run_instabot/$', views.run_instabot, name="run_instabot"),
     url(r'^stop_instabot/$', views.stop_instabot, name="stop_instabot"),
     url(r'^load_button_chain/$', views.load_button_chain, name="load_button_chain"),
+    url(r'^load_registration/$', views.load_registration, name="load_registration"),
 ]

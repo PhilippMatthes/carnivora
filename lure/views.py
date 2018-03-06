@@ -5,10 +5,9 @@ import pickle
 import subprocess
 
 from django.contrib.auth import logout, authenticate, login
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, render_to_response
-from django.template import RequestContext
 from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.models import User
 
 from carnivora.instabot.config import ConfigLoader, Config
 from carnivora.instabot.driver import Driver
@@ -26,7 +25,7 @@ def index(request):
 
 
 def main_body(request):
-    if request.user.is_superuser:
+    if request.user.is_authenticated:
         return render(request, 'main-body.html')
     else:
         return render(request, 'login.html')
@@ -45,8 +44,31 @@ def login_user(request):
     return render(request, 'login.html', {'message': 'Login failed. Please try again.'})
 
 
-@user_passes_test(lambda u: u.is_superuser)
+def load_registration(request):
+    username = request.GET['username']
+    password = request.GET['password']
+    return render(request, 'register.html', {'username': username, 'password': password})
+
+
+def register_user(request):
+    logout(request)
+    username = request.GET['username']
+    email = request.GET['email']
+    password = request.GET['password']
+
+    User.objects.create_user(username=username, email=email, password=password)
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user=user)
+            return render(request, 'main-body.html')
+    return render(request, 'register.html', {'message': 'Registration failed. Please try again.'})
+
+
 def load_button_chain(request):
+    if not request.user.is_authenticated:
+        return
     username = request.user.username
     if not os.path.exists(Config.bot_path + username):
         os.makedirs(Config.bot_path + username)
@@ -59,24 +81,27 @@ def load_button_chain(request):
     return render(request, 'buttonchain.html', {'active': active})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def run_instabot(request):
-    username = request.user.username
+    if not request.user.is_authenticated:
+        return
+
+    username = request.GET['username']
+    password = request.GET['password']
+
     if not os.path.exists(Config.bot_path + username):
         os.makedirs(Config.bot_path + username)
     running_path = Config.bot_path + username + "/running.pickle"
     with open(running_path, "wb") as f:
         pickle.dump(True, f)
 
-    password = request.GET['password']
-
     driver = Driver(username=username, password=password)
     driver.start()
     return render(request, 'buttonchain.html', {'active': True})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def stop_instabot(request):
+    if not request.user.is_authenticated:
+        return
     username = request.user.username
     if not os.path.exists(Config.bot_path + username):
         os.makedirs(Config.bot_path + username)
@@ -98,8 +123,9 @@ def update_server(request):
     return render(request, 'server_update.html', {'output': output})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def table_monitor_update(request):
+    if not request.user.is_authenticated:
+        return
     # pages = range(Log.number_of_pages(page_size=page_size))
     try:
         search = request.GET['search']
@@ -124,9 +150,9 @@ def submit_to_config(request):
         return render(request, 'settings_update.html')
 
 
-
-@user_passes_test(lambda u: u.is_superuser)
 def monitor(request):
+    if not request.user.is_authenticated:
+        return
     # pages = range(Log.number_of_pages(page_size=page_size))
     username = request.user.username
     path = Config.bot_path + username + "/log.pickle"
@@ -134,8 +160,9 @@ def monitor(request):
     return render(request, 'monitor.html', {'lines': lines})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def statistics(request):
+    if not request.user.is_authenticated:
+        return
     username = request.user.username
     hashtag_names, hashtag_scores = Statistics.get_hashtags(username=username, n=40, truncated_name_length=20)
     amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments \
