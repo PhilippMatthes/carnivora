@@ -1,6 +1,7 @@
 import json
 import operator
 import os
+import subprocess
 
 from django.shortcuts import render, render_to_response
 from django.utils.datastructures import MultiValueDictKeyError
@@ -15,6 +16,17 @@ page_size = 20
 
 def index(request):
     return render_to_response('index.html')
+
+
+def update_server(request):
+    commands = [["git", "status"], ["git", "pull"]]
+    output = []
+    for command in commands:
+        process = subprocess.Popen(command, stdout=subprocess.PIPE)
+        output.append(
+            (" ".join(command), process.stdout, str(process.wait(timeout=30)))
+        )
+    return render(request, 'server_update.html', {'output': output})
 
 
 def table_monitor_update(request):

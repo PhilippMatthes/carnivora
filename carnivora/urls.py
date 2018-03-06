@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'^settings/$', views.settings, name="settings"),
     url(r'^nsfw-check/$', views.nsfw_check, name="nsfw-check"),
     url(r'^submit_to_nsfw/$', views.submit_nsfw, name="submit_to_nsfw"),
+    url(r'^update_server/$', views.update_server, name="update_server"),
 ]

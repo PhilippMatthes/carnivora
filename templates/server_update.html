@@ -1,0 +1,12 @@
+<p id="system-output">
+    {% for line in output %}
+        <a class="ui green ribbon label">{{ line.0 }}</a>
+        <span>Exit Status: {{ line.2 }}</span>
+        <p>
+            {% for standard_line in line.1 %}
+                <p>{{ standard_line }}</p>
+            {% endfor %}
+        </p>
+    {% endfor %}
+</p>
+

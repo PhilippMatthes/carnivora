@@ -65,7 +65,7 @@
         .done(function(response) {
             $('#ajax-replace').html(response);
             clearTimeout(timeout);
-            hide_loading_indicator()
+            hide_loading_indicator();
         })
     }
     request('/monitor/')

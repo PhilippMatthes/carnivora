@@ -1,4 +1,23 @@
-<button class="ui fluid button" id="status" onclick="perform_reboot()">Reboot server now</button>
+
+
+<div class="ui form">
+    <div class="inline fields">
+        <button class="ui fluid button" id="status" onclick="perform_reboot()">Reboot server now</button>
+        <button class="ui fluid button" id="status" onclick="perform_update()">Update server</button>
+    </div>
+</div>
+
+<div id="loading-indicator">
+    <div class="ui small text loader">Updating server...</div>
+</div>
+
+<div class="ui inverted segment" style="margin-left: 8px;">
+    <p id="system-output">
+        <a class="ui green ribbon label">System</a>
+        <span>Awaiting commands...</span>
+        <p>Click "Update server" to perform a server update or "Reboot server now" to reboot the server. Make sure to reboot the server after updating!</p>
+    </p>
+</div>
 
 <script>
     function perform_reboot() {
@@ -7,7 +26,17 @@
             url: '/perform_reboot/'
         });
         $('#status').html('Performing reboot...');
+        location.reload();
     }
-    // Set new interval
-    setTimeout(function() { request('/server/'); }, 5000);
+    function perform_update() {
+        document.getElementById('loading-indicator').className = "ui active inverted dimmer";
+        $.ajax({
+            type: "GET",
+            url: '/update_server/'
+        })
+        .done(function(response) {
+            $('#system-output').replaceWith(response);
+            document.getElementById('loading-indicator').className = "";
+        })
+    }
 </script>
