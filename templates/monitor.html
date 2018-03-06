@@ -1,5 +1,15 @@
+<div class="ui form">
+    <div class="inline fields">
+        <button class="ui loading button" id="loading-button" onclick="switch_updates()">Start updating monitor</button>
+        <div class="field" style="padding-left: 8px">
+            <div class="ui icon input">
+                <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
+            </div>
+        </div>
+    </div>
+</div>
+
 <table class="ui table">
-    <button class="ui loading button" id="loading-button" onclick="switch_updates()">Start updating monitor</button>
     <thead>
         <th>Date</th>
         <th style="word-wrap: break-word; max-width: 150px;">Description</th>
@@ -19,19 +29,23 @@
 {% endfor %}
     </tbody>
 </table>
+
+<script src="static/css/Semantic-UI-CSS-master/semantic.js"></script>
 <script>
+var interval_id = setInterval(get_monitor_updates, 10000);
+var is_updating = true;
+
 function get_monitor_updates() {
+    var search = document.getElementById('search').value;
     $.ajax({
         type: "GET",
-        url: {% url 'table_monitor_update' %}
+        url: {% url 'table_monitor_update' %},
+        data: {'search': search}
     })
     .done(function(response) {
         $('#auto-updating-monitor').html(response);
     })
 }
-
-var interval_id = setInterval(get_monitor_updates, 10000);
-var is_updating = true;
 
 function switch_updates() {
     if (is_updating) {

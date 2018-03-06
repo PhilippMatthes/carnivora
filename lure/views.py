@@ -3,6 +3,7 @@ import operator
 import os
 
 from django.shortcuts import render, render_to_response
+from django.utils.datastructures import MultiValueDictKeyError
 
 from carnivora.instabot.config import ConfigLoader
 from carnivora.instabot.log import Log
@@ -18,14 +19,22 @@ def index(request):
 
 def table_monitor_update(request):
     # pages = range(Log.number_of_pages(page_size=page_size))
-    lines = Log.get(page_size)
+    try:
+        search = request.GET['search']
+    except MultiValueDictKeyError as e:
+        print(e)
+        search = ''
+    lines = Log.get(page_size, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
 
 def submit_to_config(request):
-    config_key = request.GET['config_key']
-    config_param = request.GET['config_param']
-    ConfigLoader.store(config_key, config_param)
+    try:
+        config_key = request.GET['config_key']
+        config_param = request.GET['config_param']
+        ConfigLoader.store(config_key, config_param)
+    except MultiValueDictKeyError as e:
+        print(e)
     return render(request, 'settings_update.html', {'config_key': config_key, 'config_param': config_param})
 
 
@@ -54,9 +63,13 @@ def statistics(request):
 
 
 def submit_nsfw(request):
-    link = request.GET['nsfw_link']
-    sfw, nsfw = classify_nsfw(link)
-    return render(request, 'nsfw_progress_bar.html', {'nsfw': nsfw})
+    try:
+        link = request.GET['nsfw_link']
+        sfw, nsfw = classify_nsfw(link)
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': nsfw})
+    except MultiValueDictKeyError as e:
+        print(e)
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': 0.0})
 
 
 def server(request):
