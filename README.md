@@ -13,16 +13,6 @@ Carnivora uses the following libraries:
 - Selenium Webdriver
 - urllib
 - urllib3
-- telepot
 
 ## Creating a superuser
-Before you can use the server, you must create a superuser. Type in `python manage.py createsuperuser` and follow the instructions.
-
-### Controlling the bot via Telegram
-
-```
-Start - Starts the bot in the initial phase
-Stop - Terminates the bot. It will not be able to run again!
-Pause - Pauses the bot.
-Continue - Continues after pausing the bot.
-```
+Before you can use the server properly, you must create a superuser. Type in `python manage.py createsuperuser` and follow the instructions.
