@@ -1,6 +1,6 @@
 import pickle
 
-config_store_path = "carnivora/instabot/log/config.pickle"
+config_store_path = "carnivora/instabot/config.pickle"
 
 standard_config = {
     "pypath": "/home/pi/tensorflow/bin/python3",
@@ -9,8 +9,8 @@ standard_config = {
                "illustration", "3d", "corona", "octane", "rendering", "sculpting"],
     "delay": 35,
     "start_url": "https://www.instagram.com/accounts/login/",
-    "following_link": "https://www.instagram.com/snrmtths/following/",
-    "account_url": "https://www.instagram.com/snrmtths/",
+    "following_link": "https://www.instagram.com/{}/following/",
+    "account_url": "https://www.instagram.com/{}/",
     "headless_is_available": False,
     "sections_xpath": "//*[contains(@class, '_75ljm _3qhgf')]",
     "local_name_xpath": ".//a[@class='_2g7d5 notranslate _nodr2']",
@@ -57,7 +57,6 @@ class ConfigLoader:
 
 
 class Config:
-
     config = ConfigLoader.load()
 
     pypath = config["pypath"]

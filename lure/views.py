@@ -1,6 +1,7 @@
 import json
 import operator
 import os
+import pickle
 import subprocess
 
 from django.contrib.auth import logout, authenticate, login
@@ -9,7 +10,8 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.utils.datastructures import MultiValueDictKeyError
 
-from carnivora.instabot.config import ConfigLoader
+from carnivora.instabot.config import ConfigLoader, Config
+from carnivora.instabot.driver import Driver
 from carnivora.instabot.log import Log
 from carnivora.instabot.statistics import Statistics
 from tf_open_nsfw.classify_nsfw import classify_nsfw
@@ -44,6 +46,41 @@ def login_user(request):
 
 
 @user_passes_test(lambda u: u.is_superuser)
+def load_button_chain(request):
+    username = request.user.username
+    running_path = Config.bot_path + username + "/running.pickle"
+    try:
+        with open(running_path, "rb") as f:
+            active = bool(pickle.load(f))
+    except:
+        active = False
+    return render(request, 'buttonchain.html', {'active': active})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def run_instabot(request):
+    username = request.user.username
+    running_path = Config.bot_path + username + "/running.pickle"
+    with open(running_path, "wb") as f:
+        pickle.dump(True, f)
+
+    password = request.GET['password']
+
+    driver = Driver(username=username, password=password)
+    driver.start()
+    return render(request, 'buttonchain.html', {'active': True})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def stop_instabot(request):
+    username = request.user.username
+    running_path = Config.bot_path + username + "/running.pickle"
+    with open(running_path, "wb") as f:
+        pickle.dump(False, f)
+    return render(request, 'buttonchain.html', {'active': False})
+
+
+@user_passes_test(lambda u: u.is_superuser)
 def update_server(request):
     commands = [["git", "status"], ["git", "pull"]]
     output = []
@@ -63,7 +100,9 @@ def table_monitor_update(request):
     except MultiValueDictKeyError as e:
         print(e)
         search = ''
-    lines = Log.get(page_size, search=search)
+    username = request.user.username
+    path = Config.bot_path + username + "/log.pickle"
+    lines = Log.get(logpath=path, page_size=page_size, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
 
@@ -73,15 +112,19 @@ def submit_to_config(request):
         config_key = request.GET['config_key']
         config_param = request.GET['config_param']
         ConfigLoader.store(config_key, config_param)
+        return render(request, 'settings_update.html', {'config_key': config_key, 'config_param': config_param})
     except MultiValueDictKeyError as e:
         print(e)
-    return render(request, 'settings_update.html', {'config_key': config_key, 'config_param': config_param})
+        return render(request, 'settings_update.html')
+
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def monitor(request):
     # pages = range(Log.number_of_pages(page_size=page_size))
-    lines = Log.get(page_size)
+    username = request.user.username
+    path = Config.bot_path + username + "/log.pickle"
+    lines = Log.get(logpath=path, page_size=page_size)
     return render(request, 'monitor.html', {'lines': lines})
 
 

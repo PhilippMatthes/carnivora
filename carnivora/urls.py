@@ -36,4 +36,7 @@ urlpatterns = [
     url(r'^nsfw-check/$', views.nsfw_check, name="nsfw-check"),
     url(r'^submit_to_nsfw/$', views.submit_nsfw, name="submit_to_nsfw"),
     url(r'^update_server/$', views.update_server, name="update_server"),
+    url(r'^run_instabot/$', views.run_instabot, name="run_instabot"),
+    url(r'^stop_instabot/$', views.stop_instabot, name="stop_instabot"),
+    url(r'^load_button_chain/$', views.load_button_chain, name="load_button_chain"),
 ]

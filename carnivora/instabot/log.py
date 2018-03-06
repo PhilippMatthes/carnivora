@@ -6,39 +6,30 @@ from carnivora.instabot.config import Config
 
 class Log:
     @staticmethod
-    def update(text="", image=""):
+    def update(logpath, text="", image=""):
         date = str(datetime.datetime.now())
         log = []
         try:
-            with open(Config.bot_path + "log/log.pickle", "rb") as f:
+            with open(logpath, "rb") as f:
                 log = pickle.load(f)
         except:
             pass
         log.append([date, text, image])
-        with open(Config.bot_path + "log/log.pickle", "wb") as f:
+        with open(logpath, "wb") as f:
             pickle.dump(log, f)
 
     @staticmethod
-    def get(n, search=''):
+    def get(logpath, page_size, search=''):
         log = []
         try:
-            with open(Config.bot_path + "log/log.pickle", "rb") as f:
+            with open(logpath, "rb") as f:
                 log = pickle.load(f)
         except:
             pass
-        truncated_log = reversed(log[-n:])
+        truncated_log = reversed(log[-page_size:])
         if search == '' or search is None:
             return truncated_log
         else:
             filtered_log = [t for t in truncated_log if search.lower() in t[1].lower()]
             return filtered_log
-
-    @staticmethod
-    def number_of_pages(page_size):
-        try:
-            with open(Config.bot_path + "log/log.pickle", "rb") as f:
-                log = pickle.load(f)
-        except:
-            pass
-        return int(len(log)/page_size)
 

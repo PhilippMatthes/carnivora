@@ -5,15 +5,10 @@ import sys
 import subprocess
 
 from carnivora.instabot.config import Config
+from carnivora.instabot.driver import Driver
 
 if __name__ == "__main__":
     sys.path.append('../')
-
-    print("Running instabot...")
-    try:
-        p = subprocess.Popen([Config.pypath, 'run_instabot.py'])
-    except EnvironmentError as e:  #
-        sys.exit('Failed to start subprocess.')
 
     print("Launching server with the following work directories:")
     for path in sys.path:

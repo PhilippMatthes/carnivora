@@ -1,0 +1,36 @@
+<div id="button-chain">
+{% if active %}
+<div class="field">
+    <button class="ui red button" onclick="stop_instabot()">Stop Bot</button>
+</div>
+<script>
+function stop_instabot() {
+    $.ajax({
+        type: "GET",
+        url: {% url 'stop_instabot' %}
+    })
+    .done(function(response) {
+        $('#button-chain').replaceWith(response);
+    });
+}
+</script>
+{% else %}
+<div class="field">
+    <input type="password" placeholder="Instagram password" id="password">
+    <button class="ui green button" onclick="run_instabot()">Run Bot</button>
+<script>
+function run_instabot() {
+    var password = document.getElementById('password').value;
+    $.ajax({
+        type: "GET",
+        url: {% url 'run_instabot' %},
+        data: {'password': password}
+    })
+    .done(function(response) {
+        $('#button-chain').replaceWith(response);
+    });
+}
+</script>
+</div>
+{% endif %}
+</div>
