@@ -136,10 +136,11 @@ def monitor(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def statistics(request):
-    hashtag_names, hashtag_scores = Statistics.get_hashtags(n=40, truncated_name_length=20)
+    username = request.user.username
+    hashtag_names, hashtag_scores = Statistics.get_hashtags(username=username, n=40, truncated_name_length=20)
     amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments \
-        = Statistics.get_amount_of_actions()
-    amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts()
+        = Statistics.get_amount_of_actions(username=username)
+    amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts(username=username)
     render_data = {
         'hashtag_names': json.dumps(hashtag_names),
         'hashtag_scores': hashtag_scores,
