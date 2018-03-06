@@ -48,6 +48,8 @@ def login_user(request):
 @user_passes_test(lambda u: u.is_superuser)
 def load_button_chain(request):
     username = request.user.username
+    if not os.path.exists(Config.bot_path + username):
+        os.makedirs(Config.bot_path + username)
     running_path = Config.bot_path + username + "/running.pickle"
     try:
         with open(running_path, "rb") as f:
@@ -60,6 +62,8 @@ def load_button_chain(request):
 @user_passes_test(lambda u: u.is_superuser)
 def run_instabot(request):
     username = request.user.username
+    if not os.path.exists(Config.bot_path + username):
+        os.makedirs(Config.bot_path + username)
     running_path = Config.bot_path + username + "/running.pickle"
     with open(running_path, "wb") as f:
         pickle.dump(True, f)
@@ -74,6 +78,8 @@ def run_instabot(request):
 @user_passes_test(lambda u: u.is_superuser)
 def stop_instabot(request):
     username = request.user.username
+    if not os.path.exists(Config.bot_path + username):
+        os.makedirs(Config.bot_path + username)
     running_path = Config.bot_path + username + "/running.pickle"
     with open(running_path, "wb") as f:
         pickle.dump(False, f)
