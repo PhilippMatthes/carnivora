@@ -19,19 +19,20 @@ class Log:
             pickle.dump(log, f)
 
     @staticmethod
-    def get(n, search='', offset=0):
+    def get(n, search=''):
         log = []
         try:
             with open(Config.bot_path + "log/log.pickle", "rb") as f:
                 log = pickle.load(f)
         except:
             pass
-        truncated_log = reversed(log[-n:-offset])
+        truncated_log = reversed(log[-n:])
+        print(search)
         if search == '' or search is None:
-            filtered_log = [t for t in truncated_log if t[1].lower().contains(search.lower())]
-            return filtered_log
-        else:
             return truncated_log
+        else:
+            filtered_log = [t for t in truncated_log if search.lower() in t[1].lower()]
+            return filtered_log
 
     @staticmethod
     def number_of_pages(page_size):
