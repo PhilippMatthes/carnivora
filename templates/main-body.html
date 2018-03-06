@@ -1,11 +1,13 @@
 <div class="ui pointing menu">
     <a class="active item" id="monitor" onclick="request('/monitor/'); toggle('monitor')">Monitor</a>
     <a class="item" id="statistics" onclick="request('/statistics/'); toggle('statistics')">Statistics</a>
+    {% if request.user.is_superuser %}
     <a class="item" id="settings" onclick="request('/settings/'); toggle('settings')">Settings</a>
     <a class="item" id="nsfw-check" onclick="request('/nsfw-check/'); toggle('nsfw-check')">NSFW Check</a>
     <div class="right menu">
       <a class="item" id="server" onclick="request('/server/'); toggle('server')">Server</a>
     </div>
+    {% endif %}
 </div>
 <div class="ui bottom attached segment">
   <div class="ui active inverted dimmer" id="dimmer">
