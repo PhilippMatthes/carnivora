@@ -7,3 +7,11 @@
         <div class="label">{{ nsfw }}% NSFW</div>
     </div>
 </div>
+<script>
+    $('#nsfw').progress({
+        label: 'ratio',
+        text: {
+            ratio: '{value}'
+        }
+    });
+</script>
