@@ -50,6 +50,11 @@ def load_registration(request):
     return render(request, 'register.html', {'username': username, 'password': password})
 
 
+def logout_user(request):
+    logout(request)
+    return render(request, 'logout.html')
+
+
 def register_user(request):
     logout(request)
     username = request.GET['username']
