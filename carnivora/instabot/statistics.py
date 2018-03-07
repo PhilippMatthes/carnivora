@@ -8,7 +8,7 @@ class Statistics:
     def get_hashtags(username, n=40, truncated_name_length=100):
         hashtags = {}
         try:
-            log_path = Config.bot_path + "/log/" + username
+            log_path = Config.bot_path + "log/" + username
             with open(log_path + "/hashtags.pickle", "rb") as f:
                 hashtags = pickle.load(f)
         except:
@@ -26,7 +26,7 @@ class Statistics:
     def get_amount_of_followed_accounts(username):
         followed_accounts = {}
         try:
-            log_path = Config.bot_path + "/log/" + username
+            log_path = Config.bot_path + "log/" + username
             with open(log_path + "/followed_users_all_time.pickle", "rb") as f:
                 followed_accounts = pickle.load(f)
         except:
@@ -37,8 +37,8 @@ class Statistics:
     def get_amount_of_actions(username):
         action_list = {}
         try:
-            log_path = Config.bot_path + "/log/" + username
-            with open(log_path + "/actionList.pickle", "rb") as f:
+            log_path = Config.bot_path + "log/" + username
+            with open(log_path + "/action_list.pickle", "rb") as f:
                 action_list = pickle.load(f)
         except:
             pass
