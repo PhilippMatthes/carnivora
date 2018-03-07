@@ -26,10 +26,9 @@ class Log:
                 log = pickle.load(f)
         except:
             pass
-        truncated_log = reversed(log[-page_size:])
         if search == '' or search is None:
-            return truncated_log
+            return reversed(log[-page_size:])
         else:
-            filtered_log = [t for t in truncated_log if search.lower() in t[1].lower()]
-            return filtered_log
+            filtered_log = [t for t in log if search.lower() in t[1].lower()]
+            return reversed(filtered_log[-page_size:])
 
