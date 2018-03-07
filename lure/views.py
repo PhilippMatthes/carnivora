@@ -70,9 +70,10 @@ def load_button_chain(request):
     if not request.user.is_authenticated:
         return
     username = request.user.username
-    if not os.path.exists(Config.bot_path + username):
-        os.makedirs(Config.bot_path + username)
-    running_path = Config.bot_path + username + "/running.pickle"
+    log_path = Config.bot_path + "/log/" + username
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    running_path = log_path + "/running.pickle"
     try:
         with open(running_path, "rb") as f:
             active = bool(pickle.load(f))
@@ -88,9 +89,10 @@ def run_instabot(request):
     username = request.GET['username']
     password = request.GET['password']
 
-    if not os.path.exists(Config.bot_path + username):
-        os.makedirs(Config.bot_path + username)
-    running_path = Config.bot_path + username + "/running.pickle"
+    log_path = Config.bot_path + "/log/" + username
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    running_path = log_path + "/running.pickle"
     with open(running_path, "wb") as f:
         pickle.dump(True, f)
 
@@ -103,9 +105,10 @@ def stop_instabot(request):
     if not request.user.is_authenticated:
         return
     username = request.user.username
-    if not os.path.exists(Config.bot_path + username):
-        os.makedirs(Config.bot_path + username)
-    running_path = Config.bot_path + username + "/running.pickle"
+    log_path = Config.bot_path + "/log/" + username
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    running_path = log_path + "/running.pickle"
     with open(running_path, "wb") as f:
         pickle.dump(False, f)
     return render(request, 'buttonchain.html', {'active': False})
@@ -133,7 +136,8 @@ def table_monitor_update(request):
         print(e)
         search = ''
     username = request.user.username
-    path = Config.bot_path + username + "/log.pickle"
+    log_path = Config.bot_path + "/log/" + username
+    path = log_path + "/log.pickle"
     lines = Log.get(logpath=path, page_size=page_size, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
@@ -155,7 +159,8 @@ def monitor(request):
         return
     # pages = range(Log.number_of_pages(page_size=page_size))
     username = request.user.username
-    path = Config.bot_path + username + "/log.pickle"
+    log_path = Config.bot_path + "/log/" + username
+    path = log_path + "/log.pickle"
     lines = Log.get(logpath=path, page_size=page_size)
     return render(request, 'monitor.html', {'lines': lines})
 

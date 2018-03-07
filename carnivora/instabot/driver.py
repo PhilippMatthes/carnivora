@@ -28,16 +28,18 @@ class Driver(threading.Thread):
             self.display = Xvfb()
             self.display.start()
 
-        if not os.path.exists(Config.bot_path + username):
-            os.makedirs(Config.bot_path + username)
+        log_path = Config.bot_path + "/log/" + username
 
-        self.interacting_users_path = Config.bot_path + username + "/interacting_users.pickle"
-        self.hashtags_path = Config.bot_path + username + "/hashtags.pickle"
-        self.action_list_path = Config.bot_path + username + "/action_list.pickle"
-        self.followed_users_all_time_path = Config.bot_path + username + "/followed_users_all_time.pickle"
-        self.accounts_to_unfollow_path = Config.bot_path + username + "/accounts_to_unfollow.pickle"
-        self.log_path = Config.bot_path + username + "/log.pickle"
-        self.running_path = Config.bot_path + username + "/running.pickle"
+        if not os.path.exists(log_path):
+            os.makedirs(log_path)
+
+        self.interacting_users_path = log_path + "/interacting_users.pickle"
+        self.hashtags_path = log_path + "/hashtags.pickle"
+        self.action_list_path = log_path + "/action_list.pickle"
+        self.followed_users_all_time_path = log_path + "/followed_users_all_time.pickle"
+        self.accounts_to_unfollow_path = log_path + "/accounts_to_unfollow.pickle"
+        self.log_path = log_path + "/log.pickle"
+        self.running_path = log_path + "/running.pickle"
 
         try:
             with open(self.interacting_users_path, "rb") as f:

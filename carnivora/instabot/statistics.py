@@ -8,7 +8,8 @@ class Statistics:
     def get_hashtags(username, n=40, truncated_name_length=100):
         hashtags = {}
         try:
-            with open(Config.bot_path + username + "/log/hashtags.pickle", "rb") as f:
+            log_path = Config.bot_path + "/log/" + username
+            with open(log_path + "/hashtags.pickle", "rb") as f:
                 hashtags = pickle.load(f)
         except:
             for h in Config.topics:
@@ -25,7 +26,8 @@ class Statistics:
     def get_amount_of_followed_accounts(username):
         followed_accounts = {}
         try:
-            with open(Config.bot_path + username + "/log/followed_users_all_time.pickle", "rb") as f:
+            log_path = Config.bot_path + "/log/" + username
+            with open(log_path + "/followed_users_all_time.pickle", "rb") as f:
                 followed_accounts = pickle.load(f)
         except:
             pass
@@ -35,7 +37,8 @@ class Statistics:
     def get_amount_of_actions(username):
         action_list = {}
         try:
-            with open(Config.bot_path + username + "/log/actionList.pickle", "rb") as f:
+            log_path = Config.bot_path + "/log/" + username
+            with open(log_path + "/actionList.pickle", "rb") as f:
                 action_list = pickle.load(f)
         except:
             pass
@@ -55,9 +58,3 @@ class Statistics:
                 if d["type"] == "comment":
                     amount_of_comments += 1
         return amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments
-
-
-
-
-if __name__ == "__main__":
-    print(Statistics.get_hashtags())

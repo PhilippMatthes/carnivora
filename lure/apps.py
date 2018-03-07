@@ -8,4 +8,6 @@ class LureConfig(AppConfig):
         print("Logging out all users...")
         from django.contrib.sessions.models import Session
         Session.objects.all().delete()
-        pass
+
+        print("Resetting all flags...")
+
