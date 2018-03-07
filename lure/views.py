@@ -70,7 +70,7 @@ def load_button_chain(request):
     if not request.user.is_authenticated:
         return
     username = request.user.username
-    log_path = Config.bot_path + "/log/" + username
+    log_path = Config.bot_path + "log/" + username
     if not os.path.exists(log_path):
         os.makedirs(log_path)
     running_path = log_path + "/running.pickle"
@@ -89,7 +89,7 @@ def run_instabot(request):
     username = request.GET['username']
     password = request.GET['password']
 
-    log_path = Config.bot_path + "/log/" + username
+    log_path = Config.bot_path + "log/" + username
     if not os.path.exists(log_path):
         os.makedirs(log_path)
     running_path = log_path + "/running.pickle"
@@ -105,7 +105,7 @@ def stop_instabot(request):
     if not request.user.is_authenticated:
         return
     username = request.user.username
-    log_path = Config.bot_path + "/log/" + username
+    log_path = Config.bot_path + "log/" + username
     if not os.path.exists(log_path):
         os.makedirs(log_path)
     running_path = log_path + "/running.pickle"
@@ -136,7 +136,7 @@ def table_monitor_update(request):
         print(e)
         search = ''
     username = request.user.username
-    log_path = Config.bot_path + "/log/" + username
+    log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
     lines = Log.get(logpath=path, page_size=page_size, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
@@ -159,7 +159,7 @@ def monitor(request):
         return
     # pages = range(Log.number_of_pages(page_size=page_size))
     username = request.user.username
-    log_path = Config.bot_path + "/log/" + username
+    log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
     lines = Log.get(logpath=path, page_size=page_size)
     return render(request, 'monitor.html', {'lines': lines})

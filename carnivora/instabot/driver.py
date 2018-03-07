@@ -28,7 +28,7 @@ class Driver(threading.Thread):
             self.display = Xvfb()
             self.display.start()
 
-        log_path = Config.bot_path + "/log/" + username
+        log_path = Config.bot_path + "log/" + username
 
         if not os.path.exists(log_path):
             os.makedirs(log_path)
