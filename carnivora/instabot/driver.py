@@ -258,15 +258,6 @@ class Driver(threading.Thread):
     # Likes a picture
     def like(self, topic):
         if self.running():
-            count = 0
-            while self.already_liked() and count < 10:
-                Log.update(logpath=self.log_path, text="Post already liked. Skipping.")
-                self.next_picture()
-                if self.on_post_page():
-                    Log.update(logpath=self.log_path, text='Accidently swapped to post page.')
-                    return
-                count += 1
-                sleep(1)
             try:
                 like_button = self.browser.find_element_by_xpath(Config.like_button_xpath)
                 like_button.click()
@@ -451,6 +442,15 @@ class Driver(threading.Thread):
                         self.next_picture()
                 for likes in range(3):
                     if not self.error():
+                        count = 0
+                        while self.already_liked() and count < 10:
+                            Log.update(logpath=self.log_path, text="Post already liked. Skipping.")
+                            self.next_picture()
+                            if self.on_post_page():
+                                Log.update(logpath=self.log_path, text='Accidently swapped to post page.')
+                                return
+                            count += 1
+                            sleep(1)
                         if self.post_is_sfw():
                             self.like(top_hashtags[topic_selector])
                             self.store_hashtags()
