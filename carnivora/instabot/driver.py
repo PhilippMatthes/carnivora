@@ -4,9 +4,15 @@ import os
 from selenium import webdriver  # For webpage crawling
 from time import sleep
 import time
+
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys  # For input processing
-from random import randint
+from random import randint, shuffle
 import pickle  # For data management
+
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from carnivora.instabot.config import Config
 from carnivora.instabot.log import Log
@@ -18,13 +24,20 @@ if Config.headless_is_available:
 
 
 class Driver(threading.Thread):
-    def __init__(self, username, password):
+    def __init__(
+            self,
+            username,
+            password,
+            window_width=1920,
+            window_height=1080,
+            headless_is_available=Config.headless_is_available,
+    ):
 
         self.username = username
         self.password = password
 
         # Set up virtual display
-        if Config.headless_is_available:
+        if headless_is_available:
             self.display = Xvfb()
             self.display.start()
 
@@ -44,14 +57,14 @@ class Driver(threading.Thread):
         try:
             with open(self.interacting_users_path, "rb") as f:
                 self.interacting_users = pickle.load(f)
-        except:
+        except FileNotFoundError:
             with open(self.interacting_users_path, "wb") as f:
                 self.interacting_users = []
                 pickle.dump([], f)
         try:
             with open(self.hashtags_path, "rb") as f:
                 self.hashtags = pickle.load(f)
-        except:
+        except FileNotFoundError:
             with open(self.hashtags_path, "wb") as f:
                 self.hashtags = {}
                 for h in Config.topics:
@@ -60,33 +73,30 @@ class Driver(threading.Thread):
         try:
             with open(self.action_list_path, "rb") as f:
                 self.action_list = pickle.load(f)
-        except:
+        except FileNotFoundError:
             with open(self.action_list_path, "wb") as f:
                 self.action_list = {}
                 pickle.dump({}, f)
         try:
             with open(self.followed_users_all_time_path, "rb") as f:
                 self.followed_accounts = pickle.load(f)
-        except:
+        except FileNotFoundError:
             with open(self.followed_users_all_time_path, "wb") as f:
                 self.followed_accounts = {}
                 pickle.dump({}, f)
         try:
             with open(self.accounts_to_unfollow_path, "rb") as f:
                 self.accounts_to_unfollow = pickle.load(f)
-        except:
+        except FileNotFoundError:
             with open(self.accounts_to_unfollow_path, "wb") as f:
                 self.accounts_to_unfollow = []
                 pickle.dump([], f)
 
-        # Final setup
         if Config.headless_is_available:
-            # self.browser = webdriver.PhantomJS(desired_capabilities=dcap)
             self.browser = webdriver.PhantomJS()
-
         else:
             self.browser = webdriver.Chrome(Config.bot_path + "/chromedriver")
-        self.browser.set_window_size(1980, 1080)
+        self.browser.set_window_size(window_width, window_height)
 
         super(Driver, self).__init__()
 
@@ -97,382 +107,372 @@ class Driver(threading.Thread):
         try:
             with open(self.running_path, "rb") as f:
                 return bool(pickle.load(f))
-        except Exception as e:
-            print(e)
+        except FileNotFoundError:
             return False
 
-    def timestamp(self):
+    @staticmethod
+    def timestamp():
         return time.strftime('%a %H:%M:%S') + " "
 
-    def focus(self, element):
+    def focus(self, element, browser):
         if self.running():
-            self.browser.execute_script("arguments[0].focus();", element)
+            browser.execute_script("arguments[0].focus();", element)
 
     def user_followed_already(self, user):
         if self.running():
-            if user in self.followed_accounts:
-                return True
-            else:
-                return False
+            return user in self.followed_accounts
 
-    def login(self):
+    def login(self, username, password, browser, log_path, timeout=100):
         if self.running():
-            Log.update(logpath=self.log_path, text="Logging in")
-            self.browser.get(Config.start_url)
-            sleep(5)
-
-            if self.browser.current_url == "https://www.instagram.com/":
-                return
-
+            Log.update(log_path=log_path, text="Logging in")
+            browser.get(Config.start_url)
             try:
-                username_field = self.browser.find_element_by_name("username")
-                username_field.send_keys(self.username)
-                password_field = self.browser.find_element_by_name("password")
-                password_field.send_keys(self.password)
-                password_field.send_keys(Keys.RETURN)
-                sleep(10)
-                return
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.login: ' + str(e))
-                sleep(1)
-                self.login()
-                return
+                username_field = WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.NAME, "username"))
+                )
+                pass_field = WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.NAME, "password"))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.login: ' + str(e))
+                raise e
+            username_field.send_keys(username)
+            pass_field.send_keys(password)
+            pass_field.send_keys(Keys.RETURN)
 
-    # Comments on a picture
-    def comment(self, topic):
+            Log.update(log_path=log_path, text="Logged in")
+
+    def update_action_list(self, author, action_type, topic):
+        if author not in self.action_list.keys():
+            value = {"type": action_type, "time": Driver.timestamp(), "topic": topic}
+            self.action_list[author] = [value]
+        else:
+            value = {"type": action_type, "time": Driver.timestamp(), "topic": topic}
+            author_actions = self.action_list[author]
+            author_actions.append(value)
+            self.action_list[author] = author_actions
+
+        with open(self.action_list_path, "wb") as f:
+            pickle.dump(self.action_list, f)
+
+    def comment(self, topic, browser, log_path, timeout=100):
         if self.running():
-            sleep(3)
+            author = self.author(browser=browser, log_path=log_path)
             query = Config.comments[randint(0, len(Config.comments) - 1)]
-            say = query.format(self.author(), Config.smileys[randint(0, len(Config.smileys) - 1)])
+            say = query.format(author, Config.smileys[randint(0, len(Config.smileys) - 1)])
             try:
-                comment_field = self.browser.find_element_by_xpath(Config.comment_xpath)
-                comment_field.send_keys(say)
-                comment_field.send_keys(Keys.RETURN)
-                Log.update(logpath=self.log_path, text="Commented on " + str(self.author()) + "s picture with: " + say + "\n")
+                comment_field = WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.comment_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.comment: ' + str(e))
+                raise e
+            comment_field.send_keys(say)
+            comment_field.send_keys(Keys.RETURN)
+            Log.update(log_path=log_path, text="Commented on "+str(author)+"s picture with: "+say)
+            self.update_action_list(author=author, action_type="comment", topic=topic)
 
-                if self.author() not in self.action_list.keys():
-                    value = {"type": "comment", "time": self.timestamp(), "topic": topic}
-                    self.action_list[self.author()] = [value]
-                else:
-                    value = {"type": "comment", "time": self.timestamp(), "topic": topic}
-                    author_actions = self.action_list[self.author()]
-                    author_actions.append(value)
-                    self.action_list[self.author()] = author_actions
-                with open(self.action_list_path, "wb") as userfile:
-                    pickle.dump(self.action_list, userfile)
-
-                sleep(1)
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.comment: ' + str(e))
-
-    # Searches for a certain topic
-    def search(self, query):
+    def search(self, browser, log_path, query):
         if self.running():
-            Log.update(logpath=self.log_path, text="Searching for " + query + ".")
-            self.browser.get("https://www.instagram.com/explore/tags/" + query + "/")
+            browser.get("https://www.instagram.com/explore/tags/" + query + "/")
+            Log.update(log_path=log_path, text="Searching for " + query + ".")
 
-    # Checks for error which occurs when pictures are removed while
-    # switching through
-    def error(self):
+    def error(self, browser, log_path, error_timeout=1):
         if self.running():
-            sleep(1)
             try:
-                error_message = self.browser.find_element_by_xpath(Config.error_xpath)
-                Log.update(logpath=self.log_path, text='Page loading error: ' + str(error_message))
+                error_message = WebDriverWait(browser, error_timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.error_xpath))
+                )
+                Log.update(log_path=log_path, text='Page loading error: ' + str(error_message))
                 return True
-            except KeyboardInterrupt:
-                return
-            except:
+            except TimeoutException:
                 return False
 
     # Selects the first picture in a loaded topic screen
-    def select_first(self):
+    def select_first(self, browser, log_path, timeout=100):
         if self.running():
             try:
-                pictures = self.browser.find_elements_by_xpath(Config.first_ele_xpath)
-                first_picture = None
-                if len(pictures) > 9:
-                    first_picture = pictures[9]
-                else:
-                    first_picture = pictures[len(pictures) - 1]
-                self.focus(first_picture)
-                first_picture.click()
-                sleep(1)
-                return True
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.select_first: ' + str(e))
-                sleep(5)
-                return False
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.first_ele_xpath))
+                )
+                pictures = browser.find_elements_by_xpath(Config.first_ele_xpath)
+            except (TimeoutException, NoSuchElementException) as e:
+                Log.update(log_path=log_path, text='Exception in self.select_first: ' + str(e))
+                raise e
+            if len(pictures) > 9:
+                first_picture = pictures[9]
+            else:
+                first_picture = pictures[len(pictures) - 1]
+            self.focus(first_picture, browser=browser)
+            first_picture.click()
 
-    # Switches to the next picture
-    def next_picture(self):
+    def next_picture(self, browser, log_path, timeout=100):
         if self.running():
             try:
-                sleep(5)
-                next_button = self.browser.find_element_by_xpath(Config.next_button_xpath)
-                next_button.click()
-                return
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.next_picture: ' + str(e))
-                self.browser.execute_script("window.history.go(-1)")
-                sleep(5)
-                self.select_first()
-                sleep(1)
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.next_button_xpath))
+                )
+                next_button = WebDriverWait(browser, timeout).until(
+                    EC.element_to_be_clickable((By.XPATH, Config.next_button_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.next_picture: ' + str(e))
+                raise e
+            next_button.click()
 
-    # Loads the authors name
-    def author(self):
+    def author(self, browser, log_path, timeout=100):
         if self.running():
             try:
-                author = self.browser.find_element_by_xpath(Config.author_xpath)
-                return str(author.get_attribute("title"))
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.author: ' + str(e))
-                return ""
+                author_element = WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.author_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.author: ' + str(e))
+                raise e
+            return str(author_element.get_attribute("title"))
 
     # Checks if the post is already liked
-    def already_liked(self):
+    def already_liked(self, browser, log_path, error_timeout=5):
         if self.running():
             try:
-                _ = self.browser.find_element_by_xpath(Config.like_button_full_xpath)
-                Log.update(logpath=self.log_path, text='Image was already liked.')
-                return True
-            except:
+                WebDriverWait(browser, error_timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.like_button_full_xpath))
+                )
+            except TimeoutException:
                 return False
-
-    def on_post_page(self):
-        if self.running():
-            try:
-                _ = self.browser.find_element_by_xpath(Config.next_button_xpath)
-                return False
-            except:
-                return True
+            Log.update(log_path=log_path, text='Image was already liked.')
+            return True
 
     # Likes a picture
-    def like(self, topic):
+    def like(self, browser, log_path, topic, timeout=100):
         if self.running():
+            author = self.author(browser=browser, log_path=log_path)
             try:
-                like_button = self.browser.find_element_by_xpath(Config.like_button_xpath)
-                like_button.click()
-
-                src = self.extract_picture_source()
-
-                Log.update(logpath=self.log_path, text="Liked picture/video by: " + self.author() + ".\n", image=src)
-
-                if self.author() not in self.action_list.keys():
-                    value = {"type": "like", "time": self.timestamp(), "topic": topic}
-                    self.action_list[self.author()] = [value]
-                else:
-                    value = {"type": "like", "time": self.timestamp(), "topic": topic}
-                    author_actions = self.action_list[self.author()]
-                    author_actions.append(value)
-                    self.action_list[self.author()] = author_actions
-                with open(self.action_list_path, "wb") as userfile:
-                    pickle.dump(self.action_list, userfile)
-
-                sleep(randint(0, 10) + Config.delay)
-                return
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.like: ' + str(e))
-                sleep(Config.delay)
-                self.search(topic)
-                self.select_first()
-                self.like(topic)
-                return
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.like_button_xpath))
+                )
+                like_button = WebDriverWait(browser, timeout).until(
+                    EC.element_to_be_clickable((By.XPATH, Config.like_button_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.like: ' + str(e))
+                raise e
+            like_button.click()
+            src = self.extract_picture_source(browser=browser, log_path=log_path)
+            Log.update(log_path=log_path, text="Liked picture/video by: "+author, image=src)
+            self.update_action_list(author=author, action_type="like", topic=topic)
 
     # Unfollows a user
-    def unfollow(self, name):
+    def unfollow(self, browser, log_path, name, timeout=100):
         if self.running():
-            self.browser.get("https://www.instagram.com/" + name + "/")
-            sleep(3)
+            browser.get("https://www.instagram.com/" + name + "/")
             try:
-                unfollow_button = self.browser.find_element_by_xpath(Config.unfollow_xpath)
-                unfollow_button.click()
-                sleep(2)
-            except KeyboardInterrupt:
-                return
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.unfollow: ' + str(e))
-                sleep(1)
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.unfollow_xpath))
+                )
+                unfollow_button = WebDriverWait(browser, timeout).until(
+                    EC.element_to_be_clickable((By.XPATH, Config.unfollow_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.like: ' + str(e))
+                raise e
+            unfollow_button.click()
+
+    def update_accounts_to_unfollow(self, author):
+        self.accounts_to_unfollow.append(author)
+        with open(self.accounts_to_unfollow_path, "wb") as f:
+            pickle.dump(self.accounts_to_unfollow, f)
+
+    def update_followed_accounts(self, author):
+        self.followed_accounts.update({author: Driver.timestamp()})
+        with open(self.followed_users_all_time_path, "wb") as userfile:
+            pickle.dump(self.followed_accounts, userfile)
 
     # Follows a user
-    def follow(self, topic):
+    def follow(self, browser, log_path, topic, timeout=100):
         if self.running():
-            sleep(3)
+            author = self.author(browser=browser, log_path=log_path)
             try:
-                follow = self.browser.find_element_by_xpath(Config.follow_xpath)
-                follow.click()
-                Log.update(logpath=self.log_path, text="Followed: " + self.author())
-                with open(self.accounts_to_unfollow_path, "wb") as userfile:
-                    pickle.dump(self.accounts_to_unfollow, userfile)
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.follow_xpath))
+                )
+                follow_button = WebDriverWait(browser, timeout).until(
+                    EC.element_to_be_clickable((By.XPATH, Config.follow_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.like: ' + str(e))
+                raise e
+            follow_button.click()
+            Log.update(log_path=self.log_path, text="Followed: " + author)
+            self.update_action_list(author=author, action_type="follow", topic=topic)
+            self.update_accounts_to_unfollow(author=author)
+            self.update_followed_accounts(author=author)
 
-                if self.author() not in self.action_list.keys():
-                    value = {"type": "follow", "time": self.timestamp(), "topic": topic}
-                    self.action_list[self.author()] = [value]
-                else:
-                    value = {"type": "follow", "time": self.timestamp(), "topic": topic}
-                    author_actions = self.action_list[self.author()]
-                    author_actions.append(value)
-                    self.action_list[self.author()] = author_actions
-                with open(self.action_list_path, "wb") as userfile:
-                    pickle.dump(self.action_list, userfile)
-
-                self.accounts_to_unfollow.append(self.author())
-                self.followed_accounts.update({self.author(): self.timestamp()})
-                with open(self.followed_users_all_time_path, "wb") as userfile:
-                    pickle.dump(self.followed_accounts, userfile)
-                sleep(Config.delay + randint(0, 10))
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.follow: ' + str(e))
-                sleep(1)
-
-    def open_unfollow_screen(self):
+    def open_unfollow_screen(self, browser, log_path, timeout=100):
         if self.running():
-            self.browser.get(Config.account_url.format(self.username))
-            sleep(2)
-            heart = self.browser.find_element_by_xpath(Config.following_xpath)
+            try:
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.following_xpath))
+                )
+                heart = WebDriverWait(browser, timeout).until(
+                    EC.element_to_be_clickable((By.XPATH, Config.following_xpath))
+                )
+            except TimeoutException as e:
+                Log.update(log_path=log_path, text='Exception in self.open_unfollow_screen: ' + str(e))
+                raise e
             heart.click()
-            sleep(2)
 
-    def check_follows(self):
+    def update_interacting_users(self, user):
+        self.interacting_users.append(user)
+        with open(self.interacting_users_path, "wb") as f:
+            pickle.dump(self.interacting_users, f)
+
+    def check_follows(self, browser, log_path, timeout=100):
         if self.running():
             try:
-                sections = self.browser.find_elements_by_xpath(Config.sections_xpath)
-            except Exception as e:
-                Log.update(logpath=self.log_path, text="Exception in check_follows: " + str(e))
-                return
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.sections_xpath))
+                )
+                sections = browser.find_elements_by_xpath(Config.sections_xpath)
+            except (TimeoutException, NoSuchElementException) as e:
+                Log.update(log_path=log_path, text='Exception in self.check_follows: ' + str(e))
+                raise e
+
             users = []
+
             for element in sections:
-                profile = element.find_element_by_xpath(Config.local_name_xpath)
+                try:
+                    profile = element.find_element_by_xpath(Config.local_name_xpath)
+                except NoSuchElementException as e:
+                    Log.update(log_path=log_path, text='Exception in self.check_follows: ' + str(e))
+                    raise e
                 name = profile.get_attribute("title")
                 users.append(name)
+
             for user in users:
                 if user not in self.interacting_users:
-                    if user not in self.action_list.keys():
-                        Log.update(logpath=self.log_path,
-                            text="New interaction discovered with: " + user + ", but we have no further information.")
-                        sleep(1)
-                    else:
+                    if user in self.action_list.keys():
                         actions = self.action_list[user]
-                        Log.update(logpath=self.log_path,
-                            text="New interaction discovered with: " + user + ", and we have logged our interactions on him:")
-                        sleep(1)
-                        string = ""
                         for action in actions:
-                            string += "Type: " + action["type"] + ", Time: " + action["time"] + ", Topic: " + action[
-                                "topic"] + " ... "
                             self.hashtags[action["topic"]] += 1
-                        Log.update(logpath=self.log_path, text=string)
-                        sleep(1)
-                    self.interacting_users.append(user)
-                    with open(self.interacting_users_path, "wb") as userfile:
-                        pickle.dump(self.interacting_users, userfile)
-            return
+                        self.update_interacting_users(user=user)
 
-    def store_hashtags(self):
+    def update_hashtags(self, hashtag, boost=0.1):
+        if hashtag in self.hashtags:
+            self.hashtags[hashtag] += boost
+        else:
+            self.hashtags[hashtag] = boost
+        with open(self.hashtags_path, "wb") as f:
+            pickle.dump(self.hashtags, f)
+
+    def store_hashtags(self, browser, log_path, timeout=100):
         if self.running():
             try:
-                sections = self.browser.find_elements_by_xpath(Config.hashtags_xpath)
-                for section in sections:
-                    all_hashtags = self.extract_hash_tags(section.text)
-                    for h in all_hashtags:
-                        if h in self.hashtags:
-                            self.hashtags[h] = self.hashtags[h] + 0.01
-                        else:
-                            self.hashtags[h] = 0.01
-                with open(self.hashtags_path, "wb") as f:
-                    pickle.dump(self.hashtags, f)
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Exception in self.store_hashtags: ' + str(e))
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.hashtags_xpath))
+                )
+                sections = browser.find_elements_by_xpath(Config.hashtags_xpath)
+            except (TimeoutException, NoSuchElementException) as e:
+                Log.update(log_path=log_path, text='Exception in self.store_hashtags: ' + str(e))
+                raise e
+            for section in sections:
+                all_hashtags = self.extract_hash_tags(section.text)
+                for hashtag in all_hashtags:
+                    self.update_hashtags(hashtag=hashtag)
 
     def extract_hash_tags(self, s):
         if self.running():
             return set(part[1:] for part in s.split() if part.startswith('#'))
 
-    def extract_picture_source(self):
+    def extract_picture_source(self, browser, log_path, timeout=100):
         if self.running():
             try:
-                sections = self.browser.find_elements_by_xpath(Config.image_div_container_xpath)
-                for section in sections:
+                WebDriverWait(browser, timeout).until(
+                    EC.presence_of_element_located((By.XPATH, Config.image_div_container_xpath))
+                )
+                sections = browser.find_elements_by_xpath(Config.image_div_container_xpath)
+            except (TimeoutException, NoSuchElementException) as e:
+                Log.update(log_path=log_path, text='Exception in self.extract_picture_source: ' + str(e))
+                raise e
+            for section in sections:
+                try:
                     image = section.find_element_by_tag_name("img")
-                    return image.get_attribute("src")
-            except Exception as e:
-                Log.update(logpath=self.log_path, text='Picture could not be extracted: ' + str(e))
-            return ""
+                except NoSuchElementException as e:
+                    Log.update(log_path=log_path, text='Exception in self.extract_picture_source: ' + str(e))
+                    raise e
+                return image.get_attribute("src")
 
-    def post_is_sfw(self):
+    def post_is_sfw(self, browser, log_path):
         if self.running():
-            image_url = self.extract_picture_source()
+            image_url = self.extract_picture_source(browser=browser, log_path=log_path)
             if image_url == "" or image_url is None:
                 return True
             sfw, nsfw = classify_nsfw(image_url)
-            Log.update(logpath=self.log_path, text="Analysis of this post yielded it to be {}% NSFW.".format(int(100 * nsfw)),
-                       image=image_url)
+            Log.update(
+                log_path=self.log_path,
+                text="Analysis of this post yielded it to be {}% NSFW.".format(int(100 * nsfw)),
+                image=image_url
+            )
             return nsfw < sfw
 
     def run(self):
-        self.login()
+        self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)
         while self.running:
-            self.open_unfollow_screen()
-            self.check_follows()
+            self.open_unfollow_screen(browser=self.browser, log_path=self.log_path)
+            self.check_follows(browser=self.browser, log_path=self.log_path)
 
-            top_hashtags = sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20]
-            top_hashtags_values = []
-            for hashtag in top_hashtags:
-                top_hashtags_values.append(self.hashtags[hashtag])
+            top_hashtags = shuffle(sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20])
 
             for topic_selector in range(len(top_hashtags) - 1):
 
-                self.search(top_hashtags[topic_selector])
-                self.select_first()
-                if topic_selector % 7 == 2:
-                    if not self.error():
-                        if self.post_is_sfw():
-                            self.comment(top_hashtags[topic_selector])
-                            self.store_hashtags()
-                        self.next_picture()
+                self.search(query=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
+                self.select_first(browser=self.browser, log_path=self.log_path)
+                for comments in range(1):
+                    if not self.error(browser=self.browser, log_path=self.log_path):
+                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                            self.comment(
+                                topic=top_hashtags[topic_selector],
+                                browser=self.browser,
+                                log_path=self.log_path
+                            )
+                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
+                            sleep(Config.delay)
+                        self.next_picture(browser=self.browser, log_path=self.log_path)
                 for likes in range(3):
-                    if not self.error():
-                        count = 0
-                        while self.already_liked() and count < 10:
-                            Log.update(logpath=self.log_path, text="Post already liked. Skipping.")
-                            self.next_picture()
-                            if self.on_post_page():
-                                Log.update(logpath=self.log_path, text='Accidently swapped to post page.')
-                                return
-                            count += 1
-                            sleep(1)
-                        if self.post_is_sfw():
-                            self.like(top_hashtags[topic_selector])
-                            self.store_hashtags()
-                        self.next_picture()
-                for follows in range(3):
-                    if not self.error():
-                        self.next_picture()
-                        count = 0
-                        while self.user_followed_already(self.author()) and count < 10:
-                            Log.update(logpath=self.log_path, text=self.author() + " was followed already. Skipping picture.")
-                            self.next_picture()
-                            count += 1
-                            sleep(1)
-                        if self.post_is_sfw():
-                            self.follow(top_hashtags[topic_selector])
-                            self.store_hashtags()
+                    if not self.error(browser=self.browser, log_path=self.log_path):
+                        while self.already_liked(browser=self.browser, log_path=self.log_path):
+                            Log.update(log_path=self.log_path, text="Post already liked. Skipping.")
+                            self.next_picture(browser=self.browser, log_path=self.log_path)
 
+                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                            self.like(topic=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
+                            sleep(Config.delay)
+                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
+
+                        self.next_picture(browser=self.browser, log_path=self.log_path)
+                for follows in range(2):
+                    if not self.error(browser=self.browser, log_path=self.log_path):
+                        self.next_picture(browser=self.browser, log_path=self.log_path)
+                        while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
+                            Log.update(
+                                log_path=self.log_path,
+                                text=self.author(
+                                    browser=self.browser,
+                                    log_path=self.log_path
+                                ) + " was followed already. Skipping picture."
+                            )
+                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                            self.follow(
+                                topic=top_hashtags[topic_selector],
+                                browser=self.browser,
+                                log_path=self.log_path
+                            )
+                            sleep(Config.delay)
+                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
                 if len(self.accounts_to_unfollow) > 50:
-                    for unfollows in range(3):
+                    for unfollows in range(2):
                         this_guy = self.accounts_to_unfollow[0]
-                        self.unfollow(this_guy)
+                        self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
                         del self.accounts_to_unfollow[0]
         super(Driver, self).join()

@@ -82,7 +82,7 @@ def load_button_chain(request):
     try:
         with open(running_path, "rb") as f:
             active = bool(pickle.load(f))
-    except:
+    except FileNotFoundError:
         active = False
     return render(request, 'buttonchain.html', {'active': active})
 
@@ -143,7 +143,7 @@ def table_monitor_update(request):
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
-    lines = Log.get(logpath=path, page_size=page_size, search=search)
+    lines = Log.get(log_path=path, page_size=page_size, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
 
@@ -166,7 +166,7 @@ def monitor(request):
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
-    lines = Log.get(logpath=path, page_size=page_size)
+    lines = Log.get(log_path=path, page_size=page_size)
     return render(request, 'monitor.html', {'lines': lines})
 
 

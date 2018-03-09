@@ -6,25 +6,25 @@ from carnivora.instabot.config import Config
 
 class Log:
     @staticmethod
-    def update(logpath, text="", image=""):
+    def update(log_path, text="", image=""):
         date = str(datetime.datetime.now())
         log = []
         try:
-            with open(logpath, "rb") as f:
+            with open(log_path, "rb") as f:
                 log = pickle.load(f)
         except:
             pass
         log.append([date, text, image])
-        with open(logpath, "wb") as f:
+        with open(log_path, "wb") as f:
             pickle.dump(log, f)
 
     @staticmethod
-    def get(logpath, page_size, search=''):
+    def get(log_path, page_size, search=''):
         log = []
         try:
-            with open(logpath, "rb") as f:
+            with open(log_path, "rb") as f:
                 log = pickle.load(f)
-        except:
+        except FileNotFoundError:
             pass
         if search == '' or search is None:
             return reversed(log[-page_size:])
