@@ -30,9 +30,16 @@ standard_config = {
                  "Awesome @{} {}", "Fantastic @{} {}", "@{} {}", "Brilliant one @{} {}",
                  "Pretty nice @{} {}", "Awesome feed @{} {}", "I like your feed @{} {}",
                  "Top @{} {}", "Really cool works @{}! {}", "@{} Rad!!! {}",
-                 "This is cool @{} {}", "Love this @{} {}", "Great @{}! {}", "Yeah @{} {}"],
-    "smileys": [":)", ":D", "=D", "=)", ";)", ":)", ":)", ";D"],
+                 "This is cool @{} {}", "Love this @{} {}", "Great @{}! {}", "Yeah @{} {}"
+                 "I like your unique style @{} {}", "@{} take my like {}", "@{}"],
+    "smileys": [smiley for smiley in [
+        "🙂", "☺", "😎", "😋", "😊", "😉", "😄", "😃", "😁",
+        "😀", "😜", "😝", "😲", "😇", "🤓", "😺", "😸",
+        "💪", "✌", "👌", "👍", "👏", "🙌", "🐣", "🌎"
+    ]],
 }
+
+print(standard_config["smileys"])
 
 
 class ConfigLoader:

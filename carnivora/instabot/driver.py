@@ -6,6 +6,7 @@ from time import sleep
 import time
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys  # For input processing
 from random import randint, shuffle
@@ -161,14 +162,20 @@ class Driver(threading.Thread):
             query = Config.comments[randint(0, len(Config.comments) - 1)]
             say = query.format(author, Config.smileys[randint(0, len(Config.smileys) - 1)])
             try:
-                comment_field = WebDriverWait(browser, timeout).until(
+                WebDriverWait(browser, timeout).until(
                     EC.presence_of_element_located((By.XPATH, Config.comment_xpath))
+                )
+                comment_field = WebDriverWait(browser, timeout).until(
+                    EC.element_to_be_clickable((By.XPATH, Config.comment_xpath))
                 )
             except TimeoutException as e:
                 Log.update(log_path=log_path, text='Exception in self.comment: ' + str(e))
                 raise e
-            comment_field.send_keys(say)
-            comment_field.send_keys(Keys.RETURN)
+            comment_field.click()
+            actions = ActionChains(browser)
+            actions.send_keys(say)
+            actions.send_keys(Keys.RETURN)
+            actions.perform()
             Log.update(log_path=log_path, text="Commented on "+str(author)+"s picture with: "+say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
 
