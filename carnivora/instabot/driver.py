@@ -418,7 +418,9 @@ class Driver(threading.Thread):
             if image_url == "" or image_url is None:
                 return True
             sfw, nsfw = classify_nsfw(image_url)
-            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, 
+            Log.update(
+                screenshot_path=self.screenshot_path,
+                browser=self.browser,
                 log_path=self.log_path,
                 text="Analysis of this post yielded it to be {}% NSFW.".format(int(100 * nsfw)),
                 image=image_url
@@ -451,9 +453,11 @@ class Driver(threading.Thread):
                             self.next_picture(browser=self.browser, log_path=self.log_path)
                     for likes in range(3):
                         if not self.error(browser=self.browser, log_path=self.log_path):
-                            while self.already_liked(browser=self.browser, log_path=self.log_path):
+                            count = 0
+                            while self.already_liked(browser=self.browser, log_path=self.log_path) and count < 10:
                                 Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=self.log_path, text="Post already liked. Skipping.")
                                 self.next_picture(browser=self.browser, log_path=self.log_path)
+                                count += 1
 
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.like(topic=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
@@ -464,8 +468,10 @@ class Driver(threading.Thread):
                     for follows in range(2):
                         if not self.error(browser=self.browser, log_path=self.log_path):
                             self.next_picture(browser=self.browser, log_path=self.log_path)
-                            while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
-                                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, 
+                            count = 0
+                            while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)) and count < 10:
+                                Log.update(
+                                    screenshot_path=self.screenshot_path, browser=self.browser,
                                     log_path=self.log_path,
                                     text=self.author(
                                         browser=self.browser,
@@ -473,6 +479,7 @@ class Driver(threading.Thread):
                                     ) + " was followed already. Skipping picture."
                                 )
                                 self.next_picture(browser=self.browser, log_path=self.log_path)
+                                count += 1
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.follow(
                                     topic=top_hashtags[topic_selector],
