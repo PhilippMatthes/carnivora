@@ -101,7 +101,12 @@ def run_instabot(request):
     with open(running_path, "wb") as f:
         pickle.dump(True, f)
 
-    driver = Driver(username=username, password=password)
+    screenshot_folder = "static/img/"+username
+    if not os.path.exists(screenshot_folder):
+        os.makedirs(screenshot_folder)
+    screenshot_path = screenshot_folder + "/screenshot.png"
+
+    driver = Driver(username=username, password=password, screenshot_path=screenshot_path)
     driver.start()
     return render(request, 'buttonchain.html', {'active': True})
 
@@ -145,6 +150,14 @@ def table_monitor_update(request):
     path = log_path + "/log.pickle"
     lines = Log.get(log_path=path, page_size=page_size, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
+
+
+def load_screenshot(request):
+    if not request.user.is_authenticated:
+        return
+    username = request.user.username
+    path = "static/img/"+username+"/screenshot.png"
+    return render(request, 'screenshot.html', {'src': path})
 
 
 @user_passes_test(lambda u: u.is_superuser)

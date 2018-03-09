@@ -6,7 +6,9 @@ from carnivora.instabot.config import Config
 
 class Log:
     @staticmethod
-    def update(log_path, text="", image=""):
+    def update(screenshot_path, browser, log_path, text="", image=""):
+        browser.save_screenshot(screenshot_path)
+
         date = str(datetime.datetime.now())
         log = []
         try:

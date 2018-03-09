@@ -29,6 +29,7 @@ class Driver(threading.Thread):
             self,
             username,
             password,
+            screenshot_path,
             window_width=1920,
             window_height=1080,
             headless_is_available=Config.headless_is_available,
@@ -99,6 +100,8 @@ class Driver(threading.Thread):
             self.browser = webdriver.Chrome(Config.bot_path + "/chromedriver")
         self.browser.set_window_size(window_width, window_height)
 
+        self.screenshot_path = screenshot_path
+
         super(Driver, self).__init__()
 
     def start(self):
@@ -125,7 +128,7 @@ class Driver(threading.Thread):
 
     def login(self, username, password, browser, log_path, timeout=100):
         if self.running():
-            Log.update(log_path=log_path, text="Logging in")
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text="Logging in")
             browser.get(Config.start_url)
             try:
                 username_field = WebDriverWait(browser, timeout).until(
@@ -135,13 +138,13 @@ class Driver(threading.Thread):
                     EC.presence_of_element_located((By.NAME, "password"))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.login: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.login: ' + str(e))
                 return
             username_field.send_keys(username)
             pass_field.send_keys(password)
             pass_field.send_keys(Keys.RETURN)
 
-            Log.update(log_path=log_path, text="Logged in")
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text="Logged in")
 
     def update_action_list(self, author, action_type, topic):
         if author not in self.action_list.keys():
@@ -169,20 +172,20 @@ class Driver(threading.Thread):
                     EC.element_to_be_clickable((By.XPATH, Config.comment_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.comment: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.comment: ' + str(e))
                 return
             comment_field.click()
             actions = ActionChains(browser)
             actions.send_keys(say)
             actions.send_keys(Keys.RETURN)
             actions.perform()
-            Log.update(log_path=log_path, text="Commented on "+str(author)+"s picture with: "+say)
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text="Commented on "+str(author)+"s picture with: "+say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
 
     def search(self, browser, log_path, query):
         if self.running():
             browser.get("https://www.instagram.com/explore/tags/" + query + "/")
-            Log.update(log_path=log_path, text="Searching for " + query + ".")
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text="Searching for " + query + ".")
 
     def error(self, browser, log_path, error_timeout=1):
         if self.running():
@@ -190,7 +193,7 @@ class Driver(threading.Thread):
                 error_message = WebDriverWait(browser, error_timeout).until(
                     EC.presence_of_element_located((By.XPATH, Config.error_xpath))
                 )
-                Log.update(log_path=log_path, text='Page loading error: ' + str(error_message))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Page loading error: ' + str(error_message))
                 return True
             except TimeoutException:
                 return False
@@ -204,7 +207,7 @@ class Driver(threading.Thread):
                 )
                 pictures = browser.find_elements_by_xpath(Config.first_ele_xpath)
             except (TimeoutException, NoSuchElementException) as e:
-                Log.update(log_path=log_path, text='Exception in self.select_first: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.select_first: ' + str(e))
                 return
             if len(pictures) > 9:
                 first_picture = pictures[9]
@@ -223,7 +226,7 @@ class Driver(threading.Thread):
                     EC.element_to_be_clickable((By.XPATH, Config.next_button_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.next_picture: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.next_picture: ' + str(e))
                 return
             next_button.click()
 
@@ -234,7 +237,7 @@ class Driver(threading.Thread):
                     EC.presence_of_element_located((By.XPATH, Config.author_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.author: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.author: ' + str(e))
                 return
             return str(author_element.get_attribute("title"))
 
@@ -247,7 +250,7 @@ class Driver(threading.Thread):
                 )
             except TimeoutException:
                 return False
-            Log.update(log_path=log_path, text='Image was already liked.')
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Image was already liked.')
             return True
 
     # Likes a picture
@@ -262,11 +265,11 @@ class Driver(threading.Thread):
                     EC.element_to_be_clickable((By.XPATH, Config.like_button_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.like: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.like: ' + str(e))
                 return
             like_button.click()
             src = self.extract_picture_source(browser=browser, log_path=log_path)
-            Log.update(log_path=log_path, text="Liked picture/video by: "+author, image=src)
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text="Liked picture/video by: "+author, image=src)
             self.update_action_list(author=author, action_type="like", topic=topic)
 
     # Unfollows a user
@@ -281,7 +284,7 @@ class Driver(threading.Thread):
                     EC.element_to_be_clickable((By.XPATH, Config.unfollow_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.like: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.like: ' + str(e))
                 return
             unfollow_button.click()
 
@@ -307,10 +310,10 @@ class Driver(threading.Thread):
                     EC.element_to_be_clickable((By.XPATH, Config.follow_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.like: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.like: ' + str(e))
                 return
             follow_button.click()
-            Log.update(log_path=self.log_path, text="Followed: " + author)
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=self.log_path, text="Followed: " + author)
             self.update_action_list(author=author, action_type="follow", topic=topic)
             self.update_accounts_to_unfollow(author=author)
             self.update_followed_accounts(author=author)
@@ -325,7 +328,7 @@ class Driver(threading.Thread):
                     EC.element_to_be_clickable((By.XPATH, Config.following_xpath))
                 )
             except TimeoutException as e:
-                Log.update(log_path=log_path, text='Exception in self.open_unfollow_screen: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.open_unfollow_screen: ' + str(e))
                 return
             heart.click()
 
@@ -342,7 +345,7 @@ class Driver(threading.Thread):
                 )
                 sections = browser.find_elements_by_xpath(Config.sections_xpath)
             except (TimeoutException, NoSuchElementException) as e:
-                Log.update(log_path=log_path, text='Exception in self.check_follows: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.check_follows: ' + str(e))
                 return
 
             users = []
@@ -351,7 +354,7 @@ class Driver(threading.Thread):
                 try:
                     profile = element.find_element_by_xpath(Config.local_name_xpath)
                 except NoSuchElementException as e:
-                    Log.update(log_path=log_path, text='Exception in self.check_follows: ' + str(e))
+                    Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.check_follows: ' + str(e))
                     return
                 name = profile.get_attribute("title")
                 users.append(name)
@@ -380,7 +383,7 @@ class Driver(threading.Thread):
                 )
                 sections = browser.find_elements_by_xpath(Config.hashtags_xpath)
             except (TimeoutException, NoSuchElementException) as e:
-                Log.update(log_path=log_path, text='Exception in self.store_hashtags: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.store_hashtags: ' + str(e))
                 return
             for section in sections:
                 all_hashtags = self.extract_hash_tags(section.text)
@@ -399,13 +402,13 @@ class Driver(threading.Thread):
                 )
                 sections = browser.find_elements_by_xpath(Config.image_div_container_xpath)
             except (TimeoutException, NoSuchElementException) as e:
-                Log.update(log_path=log_path, text='Exception in self.extract_picture_source: ' + str(e))
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.extract_picture_source: ' + str(e))
                 return
             for section in sections:
                 try:
                     image = section.find_element_by_tag_name("img")
                 except NoSuchElementException as e:
-                    Log.update(log_path=log_path, text='Exception in self.extract_picture_source: ' + str(e))
+                    Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=log_path, text='Exception in self.extract_picture_source: ' + str(e))
                     return
                 return image.get_attribute("src")
 
@@ -415,7 +418,7 @@ class Driver(threading.Thread):
             if image_url == "" or image_url is None:
                 return True
             sfw, nsfw = classify_nsfw(image_url)
-            Log.update(
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, 
                 log_path=self.log_path,
                 text="Analysis of this post yielded it to be {}% NSFW.".format(int(100 * nsfw)),
                 image=image_url
@@ -449,7 +452,7 @@ class Driver(threading.Thread):
                     for likes in range(3):
                         if not self.error(browser=self.browser, log_path=self.log_path):
                             while self.already_liked(browser=self.browser, log_path=self.log_path):
-                                Log.update(log_path=self.log_path, text="Post already liked. Skipping.")
+                                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=self.log_path, text="Post already liked. Skipping.")
                                 self.next_picture(browser=self.browser, log_path=self.log_path)
 
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
@@ -462,7 +465,7 @@ class Driver(threading.Thread):
                         if not self.error(browser=self.browser, log_path=self.log_path):
                             self.next_picture(browser=self.browser, log_path=self.log_path)
                             while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
-                                Log.update(
+                                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, 
                                     log_path=self.log_path,
                                     text=self.author(
                                         browser=self.browser,
@@ -484,6 +487,6 @@ class Driver(threading.Thread):
                             self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
                             del self.accounts_to_unfollow[0]
         except Exception as e:
-            Log.update(log_path=self.log_path, text='Fatal Exception: ' + str(e))
+            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=self.log_path, text='Fatal Exception: ' + str(e))
             raise e
         super(Driver, self).join()

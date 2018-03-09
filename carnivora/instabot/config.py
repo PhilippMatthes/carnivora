@@ -39,8 +39,6 @@ standard_config = {
     ]],
 }
 
-print(standard_config["smileys"])
-
 
 class ConfigLoader:
     @staticmethod

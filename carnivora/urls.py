@@ -42,4 +42,5 @@ urlpatterns = [
     url(r'^load_button_chain/$', views.load_button_chain, name="load_button_chain"),
     url(r'^load_registration/$', views.load_registration, name="load_registration"),
     url(r'^logout_user/$', views.logout_user, name="logout_user"),
+    url(r'^load_screenshot/$', views.load_screenshot, name="load_screenshot"),
 ]

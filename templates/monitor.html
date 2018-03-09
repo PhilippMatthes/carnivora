@@ -10,6 +10,8 @@
     </div>
 </div>
 
+<img class="ui rounded fluid centered image" src="static/img/placeholder-image.png" id="screenshot">
+
 <table class="ui table" style="width: 100%; table-layout: fixed;">
     <colgroup>
         <col style="width:20%">
@@ -62,6 +64,13 @@ function get_monitor_updates() {
     })
     .done(function(response) {
         $('#auto-updating-monitor').html(response);
+    });
+    $.ajax({
+        type: "GET",
+        url: {% url 'load_screenshot' %}
+    })
+    .done(function(response) {
+        $('#screenshot').replaceWith(response);
     });
 }
 
