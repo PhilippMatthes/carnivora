@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<img class="ui rounded fluid centered image" src="static/img/placeholder-image.png" id="screenshot">
+<img class="ui massive rounded centered image" src="static/img/placeholder-image.png" id="screenshot">
 
 <table class="ui table" style="width: 100%; table-layout: fixed;">
     <colgroup>
@@ -71,6 +71,8 @@ function get_monitor_updates() {
     })
     .done(function(response) {
         $('#screenshot').replaceWith(response);
+        var image = document.getElementById('screenshot').src;
+        $("#screenshot").attr("src", image + "?image=" + new Date().getTime());
     });
 }
 
