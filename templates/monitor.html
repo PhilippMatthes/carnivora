@@ -76,8 +76,6 @@ function get_monitor_updates() {
     })
     .done(function(response) {
         $('#screenshot').replaceWith(response);
-        var image = document.getElementById('screenshot').src;
-        $("#screenshot").attr("src", image + "?image=" + new Date().getTime());
     });
 }
 

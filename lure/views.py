@@ -157,7 +157,9 @@ def load_screenshot(request):
         return
     username = request.user.username
     path = "static/img/"+username+"/screenshot.png"
-    return render(request, 'screenshot.html', {'src': path})
+    time = os.path.getmtime(path)
+    src = path + "?mtime=" + str(time)
+    return render(request, 'screenshot.html', {'src': src})
 
 
 @user_passes_test(lambda u: u.is_superuser)
