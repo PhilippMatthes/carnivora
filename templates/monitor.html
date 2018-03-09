@@ -10,9 +10,9 @@
     </div>
 </div>
 
-<img class="ui large rounded centered image" src="static/img/placeholder-image.png" id="screenshot">
-
-<table class="ui table" style="width: 100%; table-layout: fixed;">
+<div class="ui grid">
+  <div class="twelve wide column">
+      <table class="ui table" style="width: 100%; table-layout: fixed;">
     <colgroup>
         <col style="width:20%">
         <col style="width:70%">
@@ -37,6 +37,11 @@
 {% endfor %}
     </tbody>
 </table>
+  </div>
+  <div class="four wide column">
+      <img class="ui fluid rounded centered image" src="static/img/placeholder-image.png" id="screenshot">
+  </div>
+</div>
 
 <script src="static/css/Semantic-UI-CSS-master/semantic.js"></script>
 <script>
