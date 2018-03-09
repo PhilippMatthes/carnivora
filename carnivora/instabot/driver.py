@@ -423,63 +423,67 @@ class Driver(threading.Thread):
             return nsfw < sfw
 
     def run(self):
-        self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)
-        while self.running:
-            self.open_unfollow_screen(browser=self.browser, log_path=self.log_path)
-            self.check_follows(browser=self.browser, log_path=self.log_path)
+        try:
+            self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)
+            while self.running:
+                self.open_unfollow_screen(browser=self.browser, log_path=self.log_path)
+                self.check_follows(browser=self.browser, log_path=self.log_path)
 
-            top_hashtags = sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20]
+                top_hashtags = sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20]
 
-            for topic_selector in range(len(top_hashtags) - 1):
+                for topic_selector in range(len(top_hashtags) - 1):
 
-                self.search(query=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
-                self.select_first(browser=self.browser, log_path=self.log_path)
-                for comments in range(1):
-                    if not self.error(browser=self.browser, log_path=self.log_path):
-                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                            self.comment(
-                                topic=top_hashtags[topic_selector],
-                                browser=self.browser,
-                                log_path=self.log_path
-                            )
-                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                            sleep(Config.delay)
-                        self.next_picture(browser=self.browser, log_path=self.log_path)
-                for likes in range(3):
-                    if not self.error(browser=self.browser, log_path=self.log_path):
-                        while self.already_liked(browser=self.browser, log_path=self.log_path):
-                            Log.update(log_path=self.log_path, text="Post already liked. Skipping.")
-                            self.next_picture(browser=self.browser, log_path=self.log_path)
-
-                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                            self.like(topic=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
-                            sleep(Config.delay)
-                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
-
-                        self.next_picture(browser=self.browser, log_path=self.log_path)
-                for follows in range(2):
-                    if not self.error(browser=self.browser, log_path=self.log_path):
-                        self.next_picture(browser=self.browser, log_path=self.log_path)
-                        while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
-                            Log.update(
-                                log_path=self.log_path,
-                                text=self.author(
+                    self.search(query=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
+                    self.select_first(browser=self.browser, log_path=self.log_path)
+                    for comments in range(1):
+                        if not self.error(browser=self.browser, log_path=self.log_path):
+                            if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                                self.comment(
+                                    topic=top_hashtags[topic_selector],
                                     browser=self.browser,
                                     log_path=self.log_path
-                                ) + " was followed already. Skipping picture."
-                            )
+                                )
+                                self.store_hashtags(browser=self.browser, log_path=self.log_path)
+                                sleep(Config.delay)
                             self.next_picture(browser=self.browser, log_path=self.log_path)
-                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                            self.follow(
-                                topic=top_hashtags[topic_selector],
-                                browser=self.browser,
-                                log_path=self.log_path
-                            )
-                            sleep(Config.delay)
-                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                if len(self.accounts_to_unfollow) > 50:
-                    for unfollows in range(2):
-                        this_guy = self.accounts_to_unfollow[0]
-                        self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
-                        del self.accounts_to_unfollow[0]
+                    for likes in range(3):
+                        if not self.error(browser=self.browser, log_path=self.log_path):
+                            while self.already_liked(browser=self.browser, log_path=self.log_path):
+                                Log.update(log_path=self.log_path, text="Post already liked. Skipping.")
+                                self.next_picture(browser=self.browser, log_path=self.log_path)
+
+                            if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                                self.like(topic=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
+                                sleep(Config.delay)
+                                self.store_hashtags(browser=self.browser, log_path=self.log_path)
+
+                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                    for follows in range(2):
+                        if not self.error(browser=self.browser, log_path=self.log_path):
+                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                            while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
+                                Log.update(
+                                    log_path=self.log_path,
+                                    text=self.author(
+                                        browser=self.browser,
+                                        log_path=self.log_path
+                                    ) + " was followed already. Skipping picture."
+                                )
+                                self.next_picture(browser=self.browser, log_path=self.log_path)
+                            if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                                self.follow(
+                                    topic=top_hashtags[topic_selector],
+                                    browser=self.browser,
+                                    log_path=self.log_path
+                                )
+                                sleep(Config.delay)
+                                self.store_hashtags(browser=self.browser, log_path=self.log_path)
+                    if len(self.accounts_to_unfollow) > 50:
+                        for unfollows in range(2):
+                            this_guy = self.accounts_to_unfollow[0]
+                            self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
+                            del self.accounts_to_unfollow[0]
+        except Exception as e:
+            Log.update(log_path=self.log_path, text='Fatal Exception: ' + str(e))
+            raise e
         super(Driver, self).join()
