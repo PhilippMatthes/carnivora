@@ -421,7 +421,7 @@ class Driver(threading.Thread):
             self.open_unfollow_screen(browser=self.browser, log_path=self.log_path)
             self.check_follows(browser=self.browser, log_path=self.log_path)
 
-            top_hashtags = shuffle(sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20])
+            top_hashtags = shuffle(list(sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20]))
 
             for topic_selector in range(len(top_hashtags) - 1):
 
