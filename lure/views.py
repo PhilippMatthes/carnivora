@@ -101,7 +101,7 @@ def run_instabot(request):
     with open(running_path, "wb") as f:
         pickle.dump(True, f)
 
-    screenshot_folder = "static/img/"+username
+    screenshot_folder = "static/img/"+request.user.username
     if not os.path.exists(screenshot_folder):
         os.makedirs(screenshot_folder)
     screenshot_path = screenshot_folder + "/screenshot.png"
@@ -155,8 +155,7 @@ def table_monitor_update(request):
 def load_screenshot(request):
     if not request.user.is_authenticated:
         return
-    username = request.user.username
-    path = "static/img/"+username+"/screenshot.png"
+    path = "static/img/"+request.user.username+"/screenshot.png"
     time = os.path.getmtime(path)
     src = path + "?mtime=" + str(time)
     return render(request, 'screenshot.html', {'src': src})
