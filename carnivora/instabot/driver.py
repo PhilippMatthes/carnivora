@@ -216,7 +216,7 @@ class Driver(threading.Thread):
             self.focus(first_picture, browser=browser)
             first_picture.click()
 
-    def next_picture(self, browser, log_path, timeout=100):
+    def next_picture(self, browser, log_path, timeout=10):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -428,9 +428,9 @@ class Driver(threading.Thread):
             return nsfw < sfw
 
     def run(self):
-        try:
-            self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)
-            while self.running:
+        self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)
+        while self.running:
+            try:
                 self.open_unfollow_screen(browser=self.browser, log_path=self.log_path)
                 self.check_follows(browser=self.browser, log_path=self.log_path)
 
@@ -493,7 +493,6 @@ class Driver(threading.Thread):
                             this_guy = self.accounts_to_unfollow[0]
                             self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
                             del self.accounts_to_unfollow[0]
-        except Exception as e:
-            Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=self.log_path, text='Fatal Exception: ' + str(e))
-            raise e
+            except Exception as e:
+                Log.update(screenshot_path=self.screenshot_path, browser=self.browser, log_path=self.log_path, text='General Exception: ' + str(e))
         super(Driver, self).join()
