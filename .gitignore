@@ -12,6 +12,9 @@ log.pickle
 running.pickle
 config.pickle
 
+img/
+!placeholder-image.png
+
 tensorflow-1.1.0-cp34-cp34m-linux_armv7l.whl
 
 ## Ignore all IntelliJ files

@@ -449,15 +449,15 @@ class Driver(threading.Thread):
 
                 top_hashtags = sorted(self.hashtags.keys(), key=lambda k: self.hashtags[k], reverse=True)[:20]
 
-                for topic_selector in range(len(top_hashtags) - 1):
+                for i, topic in enumerate(top_hashtags):
 
-                    self.search(query=top_hashtags[topic_selector], browser=self.browser, log_path=self.log_path)
+                    self.search(query=topic, browser=self.browser, log_path=self.log_path)
                     self.select_first(browser=self.browser, log_path=self.log_path)
                     for comments in range(1):
                         if not self.error(browser=self.browser, log_path=self.log_path):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.comment(
-                                    topic=top_hashtags[topic_selector],
+                                    topic=topic,
                                     browser=self.browser,
                                     log_path=self.log_path
                                 )
@@ -474,7 +474,7 @@ class Driver(threading.Thread):
                                 count += 1
 
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                                self.like(topic=top_hashtags[topic_selector], browser=self.browser,
+                                self.like(topic=topic, browser=self.browser,
                                           log_path=self.log_path)
                                 sleep(Config.delay)
                                 self.store_hashtags(browser=self.browser, log_path=self.log_path)
@@ -497,7 +497,7 @@ class Driver(threading.Thread):
                                 count += 1
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.follow(
-                                    topic=top_hashtags[topic_selector],
+                                    topic=topic,
                                     browser=self.browser,
                                     log_path=self.log_path
                                 )
