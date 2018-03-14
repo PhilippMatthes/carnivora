@@ -163,9 +163,12 @@ class Driver(threading.Thread):
             except TimeoutException:
                 Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in comment')
                 return
-            comment_field.click()
-            comment_field.send_keys(say)
-            comment_field.send_keys(Keys.RETURN)
+            try:
+                comment_field.send_keys(say)
+                comment_field.send_keys(Keys.RETURN)
+            except TypeError:
+                Log.update(self.screenshot_path, self.browser, log_path, 'Could not send keys to comment field')
+                return
             Log.update(self.screenshot_path, self.browser, log_path, "Commented on "+str(author)+"s picture with: "+say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
 
