@@ -169,7 +169,6 @@ class Driver(threading.Thread):
             actions.send_keys_to_element(comment_field, say)
             actions.send_keys_to_element(comment_field, Keys.RETURN)
             actions.perform()
-            comment_field.send_keys(Keys.RETURN)
             Log.update(self.screenshot_path, self.browser, log_path, "Commented on "+str(author)+"s picture with: "+say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
 
