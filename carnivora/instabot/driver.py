@@ -115,7 +115,7 @@ class Driver(threading.Thread):
         if self.running():
             return user in self.followed_accounts
 
-    def login(self, username, password, browser, log_path, timeout=10):
+    def login(self, username, password, browser, log_path, timeout=5):
         if self.running():
             Log.update(self.screenshot_path, self.browser, log_path, "Logging in")
             browser.get(Config.start_url)
@@ -149,7 +149,7 @@ class Driver(threading.Thread):
         with open(self.action_list_path, "wb") as f:
             pickle.dump(self.action_list, f)
 
-    def comment(self, topic, browser, log_path, timeout=10):
+    def comment(self, topic, browser, log_path, timeout=5):
         if self.running():
             author = self.author(browser=browser, log_path=log_path)
             query = Config.comments[randint(0, len(Config.comments) - 1)]
@@ -190,7 +190,7 @@ class Driver(threading.Thread):
                 return False
 
     # Selects the first picture in a loaded topic screen
-    def select_first(self, browser, log_path, timeout=10):
+    def select_first(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -208,7 +208,7 @@ class Driver(threading.Thread):
             self.focus(first_picture, browser=browser)
             first_picture.click()
 
-    def next_picture(self, browser, log_path, timeout=10):
+    def next_picture(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -223,7 +223,7 @@ class Driver(threading.Thread):
                 return
             next_button.click()
 
-    def author(self, browser, log_path, timeout=10):
+    def author(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 author_element = WebDriverWait(browser, timeout).until(
@@ -248,7 +248,7 @@ class Driver(threading.Thread):
             return True
 
     # Likes a picture
-    def like(self, browser, log_path, topic, timeout=10):
+    def like(self, browser, log_path, topic, timeout=5):
         if self.running():
             author = self.author(browser=browser, log_path=log_path)
             try:
@@ -267,7 +267,7 @@ class Driver(threading.Thread):
             self.update_action_list(author=author, action_type="like", topic=topic)
 
     # Unfollows a user
-    def unfollow(self, browser, log_path, name, timeout=10):
+    def unfollow(self, browser, log_path, name, timeout=5):
         if self.running():
             browser.get("https://www.instagram.com/" + name + "/")
             try:
@@ -293,7 +293,7 @@ class Driver(threading.Thread):
             pickle.dump(self.followed_accounts, userfile)
 
     # Follows a user
-    def follow(self, browser, log_path, topic, timeout=10):
+    def follow(self, browser, log_path, topic, timeout=5):
         if self.running():
             author = self.author(browser=browser, log_path=log_path)
             try:
@@ -312,7 +312,7 @@ class Driver(threading.Thread):
             self.update_accounts_to_unfollow(author=author)
             self.update_followed_accounts(author=author)
 
-    def open_unfollow_screen(self, browser, log_path, timeout=10):
+    def open_unfollow_screen(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -332,7 +332,7 @@ class Driver(threading.Thread):
         with open(self.interacting_users_path, "wb") as f:
             pickle.dump(self.interacting_users, f)
 
-    def check_follows(self, browser, log_path, timeout=10):
+    def check_follows(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -372,7 +372,7 @@ class Driver(threading.Thread):
         with open(self.hashtags_path, "wb") as f:
             pickle.dump(self.hashtags, f)
 
-    def store_hashtags(self, browser, log_path, timeout=10):
+    def store_hashtags(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -392,7 +392,7 @@ class Driver(threading.Thread):
         if self.running():
             return set(part[1:] for part in s.split() if part.startswith('#'))
 
-    def extract_picture_source(self, browser, log_path, timeout=10):
+    def extract_picture_source(self, browser, log_path, timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
