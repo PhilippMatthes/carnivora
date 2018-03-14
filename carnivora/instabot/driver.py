@@ -166,7 +166,8 @@ class Driver(threading.Thread):
                 return
             comment_field.click()
             actions = ActionChains(browser)
-            actions.send_keys(say)
+            actions.send_keys_to_element(comment_field, say)
+            actions.send_keys_to_element(comment_field, Keys.RETURN)
             actions.perform()
             comment_field.send_keys(Keys.RETURN)
             Log.update(self.screenshot_path, self.browser, log_path, "Commented on "+str(author)+"s picture with: "+say)
