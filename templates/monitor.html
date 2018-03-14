@@ -1,12 +1,21 @@
 <div class="ui form">
     <div class="inline fields">
-        <button class="ui loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
-        <div class="field" style="padding-left: 8px">
-            <div class="ui icon input">
-                <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
+        <div class="inline fields">
+            <div class="field">
+                <button class="ui loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
+            </div>
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="number" min="0" step="1" placeholder="Results" id="n" oninput="get_monitor_updates()">
+                </div>
             </div>
         </div>
-        <div id="button-chain"></div>
+    <div class="inline fields" id="button-chain"></div>
     </div>
 </div>
 
@@ -62,10 +71,11 @@ load_button_chain();
 
 function get_monitor_updates() {
     var search = document.getElementById('search').value;
+    var n = document.getElementById('n').value;
     $.ajax({
         type: "GET",
         url: {% url 'table_monitor_update' %},
-        data: {'search': search}
+        data: {'search': search, 'n': n}
     })
     .done(function(response) {
         $('#auto-updating-monitor').html(response);

@@ -1,45 +1,51 @@
+<canvas class="ui segment" id="timeline-chart"></canvas>
 
+<div class="ui segment grid">
+  <div class="eight wide column">
+    <div class="ui olive progress" data-value="{{ amount_of_interactions }}" data-total="{{ amount_of_interactions }}" id="interactions">
+      <div class="bar">
+          <div class="progress"></div>
+      </div>
+      <div class="label">Total interactions</div>
+    </div>
 
-<canvas id="hashtags-chart" height="80"></canvas>
+    <div class="ui green progress" data-value="{{ amount_of_users }}" data-total="{{ amount_of_interactions }}" id="users">
+      <div class="bar">
+          <div class="progress"></div>
+      </div>
+      <div class="label">Users we interacted with</div>
+    </div>
 
-<div class="ui olive progress" data-value="{{ amount_of_interactions }}" data-total="{{ amount_of_interactions }}" id="interactions">
-  <div class="bar">
-      <div class="progress"></div>
+    <div class="ui teal progress" data-value="{{ amount_of_likes }}" data-total="{{ amount_of_interactions }}" id="likes">
+      <div class="bar">
+          <div class="progress"></div>
+      </div>
+      <div class="label">Likes on posts</div>
+    </div>
+
+    <div class="ui blue progress" data-value="{{ amount_of_follows }}" data-total="{{ amount_of_interactions }}" id="follows">
+      <div class="bar">
+          <div class="progress"></div>
+      </div>
+      <div class="label">Followed users</div>
+    </div>
+
+    <div class="ui violet progress" data-value="{{ amount_of_comments }}" data-total="{{ amount_of_interactions }}" id="comments">
+      <div class="bar">
+          <div class="progress"></div>
+      </div>
+      <div class="label">Comments on posts</div>
+    </div>
   </div>
-  <div class="label">Total interactions</div>
+  <div class="eight wide column">
+      <canvas id="hashtags-chart"></canvas>
+  </div>
 </div>
 
-<div class="ui green progress" data-value="{{ amount_of_users }}" data-total="{{ amount_of_interactions }}" id="users">
-  <div class="bar">
-      <div class="progress"></div>
-  </div>
-  <div class="label">Users we interacted with</div>
-</div>
-
-<div class="ui teal progress" data-value="{{ amount_of_likes }}" data-total="{{ amount_of_interactions }}" id="likes">
-  <div class="bar">
-      <div class="progress"></div>
-  </div>
-  <div class="label">Likes on posts</div>
-</div>
-
-<div class="ui blue progress" data-value="{{ amount_of_follows }}" data-total="{{ amount_of_interactions }}" id="follows">
-  <div class="bar">
-      <div class="progress"></div>
-  </div>
-  <div class="label">Followed users</div>
-</div>
-
-<div class="ui violet progress" data-value="{{ amount_of_comments }}" data-total="{{ amount_of_interactions }}" id="comments">
-  <div class="bar">
-      <div class="progress"></div>
-  </div>
-  <div class="label">Comments on posts</div>
-</div>
 
 <script>
-var ctx = document.getElementById("hashtags-chart").getContext('2d');
-var chart = new Chart(ctx, {
+var ctx_hashtags = document.getElementById("hashtags-chart").getContext('2d');
+var chart_hashtags = new Chart(ctx_hashtags, {
     type: 'bar',
     data: {
         labels: {{ hashtag_names|safe }},
@@ -52,6 +58,47 @@ var chart = new Chart(ctx, {
     options: {
         scales: {
             yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+var ctx_timeline = document.getElementById("timeline-chart").getContext('2d');
+var chart_timeline = new Chart(ctx_timeline, {
+    type: 'line',
+    data: {
+        labels: [
+            {{ likes_dates_strings|safe }},
+            {{ follows_dates_strings|safe }},
+            {{ comments_dates_strings|safe }}
+        ],
+        datasets: [
+            {
+                label: 'Likes',
+                data: {{ likes_quantities }},
+                borderWidth: 1,
+                backgroundColor: '#1abc9c'
+            },
+            {
+                label: 'Follows',
+                data: {{ follows_quantities }},
+                borderWidth: 1,
+                backgroundColor: '#3498db'
+            },
+            {
+                label: 'Comments',
+                data: {{ comments_quantities }},
+                borderWidth: 1,
+                backgroundColor: '#9b59b6'
+            }
+        ]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                stacked: true,
                 ticks: {
                     beginAtZero:true
                 }

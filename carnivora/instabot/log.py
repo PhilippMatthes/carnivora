@@ -14,7 +14,7 @@ class Log:
         try:
             with open(log_path, "rb") as f:
                 log = pickle.load(f)
-        except:
+        except FileNotFoundError:
             pass
         log.append([date, text, image])
         with open(log_path, "wb") as f:

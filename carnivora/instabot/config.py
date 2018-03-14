@@ -10,7 +10,6 @@ standard_config = {
     "start_url": "https://www.instagram.com/accounts/login/",
     "following_link": "https://www.instagram.com/{}/following/",
     "account_url": "https://www.instagram.com/{}/",
-    "headless_is_available": False,
     "sections_xpath": "//*[contains(@class, '_75ljm _3qhgf')]",
     "local_name_xpath": ".//a[@class='_2g7d5 notranslate _nodr2']",
     "local_follow_xpath": "//a[@class='_ov9ai']",
@@ -46,7 +45,7 @@ class ConfigLoader:
         try:
             with open(config_store_path, "rb") as f:
                 return pickle.load(f)
-        except:
+        except FileNotFoundError:
             with open(config_store_path, "wb") as f:
                 pickle.dump(standard_config, f)
                 return standard_config
@@ -70,7 +69,6 @@ class Config:
     start_url = config["start_url"]
     following_link = config["following_link"]
     account_url = config["account_url"]
-    headless_is_available = bool(config["headless_is_available"])
 
     sections_xpath = config["sections_xpath"]
     local_name_xpath = config["local_name_xpath"]

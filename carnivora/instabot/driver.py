@@ -1,3 +1,4 @@
+import datetime
 import threading
 
 import os
@@ -5,7 +6,6 @@ from traceback import format_exc
 
 from selenium import webdriver  # For webpage crawling
 from time import sleep
-import time
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
@@ -22,9 +22,6 @@ from carnivora.instabot.log import Log
 
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
-if Config.headless_is_available:
-    from xvfbwrapper import Xvfb
-
 
 class Driver(threading.Thread):
     def __init__(
@@ -34,16 +31,10 @@ class Driver(threading.Thread):
             screenshot_path,
             window_width=1920,
             window_height=1080,
-            headless_is_available=Config.headless_is_available,
     ):
 
         self.username = username
         self.password = password
-
-        # Set up virtual display
-        if headless_is_available:
-            self.display = Xvfb()
-            self.display.start()
 
         log_path = Config.bot_path + "log/" + username
 
@@ -96,12 +87,8 @@ class Driver(threading.Thread):
                 self.accounts_to_unfollow = []
                 pickle.dump([], f)
 
-        if Config.headless_is_available:
-            self.browser = webdriver.PhantomJS()
-        else:
-            self.browser = webdriver.Chrome(Config.bot_path + "/chromedriver")
+        self.browser = webdriver.PhantomJS()
         self.browser.set_window_size(window_width, window_height)
-
         self.screenshot_path = screenshot_path
 
         super(Driver, self).__init__()
@@ -117,8 +104,8 @@ class Driver(threading.Thread):
             return False
 
     @staticmethod
-    def timestamp():
-        return time.strftime('%a %H:%M:%S') + " "
+    def now():
+        return datetime.datetime.now()
 
     def focus(self, element, browser):
         if self.running():
@@ -151,10 +138,10 @@ class Driver(threading.Thread):
 
     def update_action_list(self, author, action_type, topic):
         if author not in self.action_list.keys():
-            value = {"type": action_type, "time": Driver.timestamp(), "topic": topic}
+            value = {"type": action_type, "time": Driver.now(), "topic": topic}
             self.action_list[author] = [value]
         else:
-            value = {"type": action_type, "time": Driver.timestamp(), "topic": topic}
+            value = {"type": action_type, "time": Driver.now(), "topic": topic}
             author_actions = self.action_list[author]
             author_actions.append(value)
             self.action_list[author] = author_actions
@@ -301,7 +288,7 @@ class Driver(threading.Thread):
             pickle.dump(self.accounts_to_unfollow, f)
 
     def update_followed_accounts(self, author):
-        self.followed_accounts.update({author: Driver.timestamp()})
+        self.followed_accounts.update({author: Driver.now()})
         with open(self.followed_users_all_time_path, "wb") as userfile:
             pickle.dump(self.followed_accounts, userfile)
 
@@ -511,4 +498,5 @@ class Driver(threading.Thread):
             except Exception:
                 Log.update(self.screenshot_path, self.browser, self.log_path,
                            text='General Exception: ' + str(format_exc()))
+        Log.update(self.screenshot_path, self.browser, self.log_path, text='Stopped bot')
         super(Driver, self).join()

@@ -17,8 +17,6 @@ from tf_open_nsfw.classify_nsfw import classify_nsfw
 
 from django.contrib.auth.decorators import user_passes_test
 
-page_size = 20
-
 
 def index(request):
     return render_to_response('index.html')
@@ -101,7 +99,7 @@ def run_instabot(request):
     with open(running_path, "wb") as f:
         pickle.dump(True, f)
 
-    screenshot_folder = "static/img/"+request.user.username
+    screenshot_folder = "static/img/" + request.user.username
     if not os.path.exists(screenshot_folder):
         os.makedirs(screenshot_folder)
     screenshot_path = screenshot_folder + "/screenshot.png"
@@ -142,20 +140,21 @@ def table_monitor_update(request):
     # pages = range(Log.number_of_pages(page_size=page_size))
     try:
         search = request.GET['search']
-    except MultiValueDictKeyError as e:
-        print(e)
+        n = int(request.GET['n'])
+    except (MultiValueDictKeyError, ValueError):
         search = ''
+        n = 20
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
-    lines = Log.get(log_path=path, page_size=page_size, search=search)
+    lines = Log.get(log_path=path, page_size=n, search=search)
     return render(request, 'table_monitor_update.html', {'lines': lines})
 
 
 def load_screenshot(request):
     if not request.user.is_authenticated:
         return
-    path = "static/img/"+request.user.username+"/screenshot.png"
+    path = "static/img/" + request.user.username + "/screenshot.png"
     time = os.path.getmtime(path)
     src = path + "?mtime=" + str(time)
     return render(request, 'screenshot.html', {'src': src})
@@ -176,11 +175,17 @@ def submit_to_config(request):
 def monitor(request):
     if not request.user.is_authenticated:
         return
+    try:
+        search = request.GET['search']
+        n = int(request.GET['n'])
+    except (MultiValueDictKeyError, ValueError):
+        search = ''
+        n = 20
     # pages = range(Log.number_of_pages(page_size=page_size))
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
-    lines = Log.get(log_path=path, page_size=page_size)
+    lines = Log.get(log_path=path, page_size=n, search=search)
     return render(request, 'monitor.html', {'lines': lines})
 
 
@@ -188,10 +193,15 @@ def statistics(request):
     if not request.user.is_authenticated:
         return
     username = request.user.username
+
     hashtag_names, hashtag_scores = Statistics.get_hashtags(username=username, n=40, truncated_name_length=20)
+
     amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments \
         = Statistics.get_amount_of_actions(username=username)
     amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts(username=username)
+
+    lds, lq, cds, cq, fds, fq = Statistics.get_timelines(username=username)
+
     render_data = {
         'hashtag_names': json.dumps(hashtag_names),
         'hashtag_scores': hashtag_scores,
@@ -201,6 +211,12 @@ def statistics(request):
         'amount_of_follows': amount_of_follows,
         'amount_of_interactions': amount_of_interactions,
         'amount_of_follows_all_time': amount_of_follows_all_time,
+        'likes_dates_strings': lds,
+        'likes_quantities': lq,
+        'comments_dates_strings': cds,
+        'comments_quantities': cq,
+        'follows_dates_strings': fds,
+        'follows_quantities': fq,
     }
     return render(request, 'statistics.html', render_data)
 
@@ -210,7 +226,7 @@ def submit_nsfw(request):
     try:
         link = request.GET['nsfw_link']
         sfw, nsfw = classify_nsfw(link)
-        return render(request, 'nsfw_progress_bar.html', {'nsfw': int(nsfw*100)})
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': int(nsfw * 100)})
     except MultiValueDictKeyError as e:
         print(e)
         return render(request, 'nsfw_progress_bar.html', {'nsfw': 0})
