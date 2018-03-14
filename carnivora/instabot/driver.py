@@ -415,7 +415,7 @@ class Driver(threading.Thread):
     def post_is_sfw(self, browser, log_path):
         if self.running():
             image_url = self.extract_picture_source(browser=browser, log_path=log_path)
-            if image_url == "" or image_url is None:
+            if not image_url:
                 return True
             sfw, nsfw = classify_nsfw(image_url)
             Log.update(
