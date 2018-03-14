@@ -67,39 +67,26 @@ class Statistics:
         return amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments
 
     @staticmethod
+    def extract(actions_flattened, action_type, dateformat="%Y-%m-%d"):
+        lst = [item["time"] for item in actions_flattened if item["type"] == action_type]
+        if not lst:
+            return [], []
+        days = {}
+        for dt in lst:
+            days.setdefault(dt.toordinal(), []).append(dt)
+        grouped = [days.get(day, []) for day in range(min(days), max(days) + 1)]
+        strings = [date.fromordinal(day).strftime(dateformat) for day in range(min(days), max(days) + 1)]
+        quantities = [len(l) for l in grouped]
+        return strings, quantities
+
+    @staticmethod
     def get_timelines(username):
         actions = Statistics.get_actions(username)
         actions_flattened = list(chain.from_iterable([values for _, values in actions.items()]))
 
-        likes = [item["time"] for item in actions_flattened if item["type"] == "like"]
-        comments = [item["time"] for item in actions_flattened if item["type"] == "comment"]
-        follows = [item["time"] for item in actions_flattened if item["type"] == "follow"]
-
-        days_likes = {}
-        days_comments = {}
-        days_follows = {}
-
-        for dt in likes:
-            days_likes.setdefault(dt.toordinal(), []).append(dt)
-        for dt in comments:
-            days_comments.setdefault(dt.toordinal(), []).append(dt)
-        for dt in follows:
-            days_follows.setdefault(dt.toordinal(), []).append(dt)
-
-        likes_grouped = [days_likes.get(day, []) for day in range(min(days_likes), max(days_likes) + 1)]
-        comments_grouped = [days_comments.get(day, []) for day in range(min(days_comments), max(days_comments) + 1)]
-        follows_grouped = [days_follows.get(day, []) for day in range(min(days_follows), max(days_follows) + 1)]
-
-        likes_dates_strings = [date.fromordinal(day).strftime("%Y-%m-%d")
-                               for day in range(min(days_likes), max(days_likes) + 1)]
-        comments_dates_strings = [date.fromordinal(day).strftime("%Y-%m-%d")
-                                  for day in range(min(days_comments), max(days_comments) + 1)]
-        follows_dates_strings = [date.fromordinal(day).strftime("%Y-%m-%d")
-                                 for day in range(min(days_follows), max(days_follows) + 1)]
-
-        likes_quantities = [len(l) for l in likes_grouped]
-        comments_quantities = [len(l) for l in comments_grouped]
-        follows_quantities = [len(l) for l in follows_grouped]
+        likes_dates_strings, likes_quantities = Statistics.extract(actions_flattened, action_type="like")
+        comments_dates_strings, comments_quantities = Statistics.extract(actions_flattened, action_type="comment")
+        follows_dates_strings, follows_quantities = Statistics.extract(actions_flattened, action_type="follow")
 
         return \
             likes_dates_strings, likes_quantities,\
