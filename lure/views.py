@@ -137,13 +137,14 @@ def update_server(request):
 def table_monitor_update(request):
     if not request.user.is_authenticated:
         return
-    # pages = range(Log.number_of_pages(page_size=page_size))
     try:
-        search = request.GET['search']
         n = int(request.GET['n'])
     except (MultiValueDictKeyError, ValueError):
-        search = ''
         n = 20
+    try:
+        search = request.GET['search']
+    except (MultiValueDictKeyError, ValueError):
+        search = ''
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
@@ -176,11 +177,13 @@ def monitor(request):
     if not request.user.is_authenticated:
         return
     try:
-        search = request.GET['search']
         n = int(request.GET['n'])
     except (MultiValueDictKeyError, ValueError):
-        search = ''
         n = 20
+    try:
+        search = request.GET['search']
+    except (MultiValueDictKeyError, ValueError):
+        search = ''
     # pages = range(Log.number_of_pages(page_size=page_size))
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
