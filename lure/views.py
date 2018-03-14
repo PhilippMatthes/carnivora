@@ -184,12 +184,19 @@ def monitor(request):
         search = request.GET['search']
     except (MultiValueDictKeyError, ValueError):
         search = ''
+
+    if not request.user.is_authenticated:
+        return
+    path = "static/img/" + request.user.username + "/screenshot.png"
+    time = os.path.getmtime(path)
+    src = path + "?mtime=" + str(time)
+
     # pages = range(Log.number_of_pages(page_size=page_size))
     username = request.user.username
     log_path = Config.bot_path + "log/" + username
     path = log_path + "/log.pickle"
     lines = Log.get(log_path=path, page_size=n, search=search)
-    return render(request, 'monitor.html', {'lines': lines})
+    return render(request, 'monitor.html', {'lines': lines, 'src': src})
 
 
 def statistics(request):

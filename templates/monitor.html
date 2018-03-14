@@ -47,15 +47,15 @@
     </tbody>
 </table>
 </div>
-<div class="four wide column">
+<div class="four wide column" id="screen">
     <div class="ui rounded blurring segment" style="padding: 0px;">
     <div class="ui fade reveal">
       <div class="visible content">
-        <img class="ui fluid centered image" onclick="show_modal()" src="static/img/placeholder-image.png" id="screenshot">
+        <img class="ui fluid centered image" onclick="show_modal()" src="{{ src }}" id="screenshot">
       </div>
       <div class="hidden content">
-          <img class="ui fluid centered image" onclick="show_modal()" src="static/img/placeholder-image.png" id="screenshot_blurry">
-          <div class="ui active dimmer">
+          <img class="ui fluid centered image" onclick="show_modal()" src="{{ src }}" id="screenshot_blurry">
+          <div class="ui active dimmer" id="dimmer">
             <div class="content">
               <h2 class="ui icon header">
                 <i class="heart icon"></i>
@@ -66,11 +66,11 @@
       </div>
     </div>
     </div>
-</div>
-<div class="ui modal" id="modal">
-  <div class="scrolling content">
-    <img class="ui fluid rounded centered image" src="static/img/placeholder-image.png" id="modal_screenshot">
-  </div>
+    <div class="ui modal" id="modal">
+      <div class="scrolling content">
+        <img class="ui fluid rounded centered image" src="{{ src }}" id="modal_screenshot">
+      </div>
+    </div>
 </div>
 </div>
 
@@ -112,9 +112,7 @@ function get_monitor_updates() {
         url: {% url 'load_screenshot' %}
     })
     .done(function(response) {
-        $('#screenshot').replaceWith(response);
-        $('#modal_screenshot').replaceWith(response);
-        $('#screenshot_blurry').replaceWith(response);
+        $('#screen').replaceWith(response);
     });
 }
 
