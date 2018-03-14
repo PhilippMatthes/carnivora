@@ -8,7 +8,7 @@ from selenium import webdriver  # For webpage crawling
 from time import sleep
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from selenium.webdriver import ActionChains
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys  # For input processing
 from random import randint
@@ -433,7 +433,7 @@ class Driver(threading.Thread):
 
     def run(self):
         self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)
-        while self.running:
+        while self.running():
             try:
                 self.open_unfollow_screen(browser=self.browser, log_path=self.log_path)
                 self.check_follows(browser=self.browser, log_path=self.log_path)
