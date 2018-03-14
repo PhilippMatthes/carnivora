@@ -46,16 +46,43 @@
 {% endfor %}
     </tbody>
 </table>
+</div>
+<div class="four wide column">
+    <div class="ui rounded blurring segment" style="padding: 0px;">
+    <div class="ui fade reveal">
+      <div class="visible content">
+        <img class="ui fluid centered image" onclick="show_modal()" src="static/img/placeholder-image.png" id="screenshot">
+      </div>
+      <div class="hidden content">
+          <img class="ui fluid centered image" onclick="show_modal()" src="static/img/placeholder-image.png" id="screenshot_blurry">
+          <div class="ui active dimmer">
+            <div class="content">
+              <h2 class="ui icon header">
+                <i class="heart icon"></i>
+                Fullscreen
+              </h2>
+            </div>
+          </div>
+      </div>
+    </div>
+    </div>
+</div>
+<div class="ui modal" id="modal">
+  <div class="scrolling content">
+    <img class="ui fluid rounded centered image" src="static/img/placeholder-image.png" id="modal_screenshot">
   </div>
-  <div class="four wide column">
-      <img class="ui fluid rounded centered image" src="static/img/placeholder-image.png" id="screenshot">
-  </div>
+</div>
 </div>
 
 <script src="static/css/Semantic-UI-CSS-master/semantic.js"></script>
 <script>
 var interval_id = setInterval(get_monitor_updates, 10000);
 var is_updating = true;
+
+function show_modal() {
+    console.log("test");
+    $('#modal').modal('show');
+}
 
 function load_button_chain() {
     $.ajax({
@@ -86,6 +113,8 @@ function get_monitor_updates() {
     })
     .done(function(response) {
         $('#screenshot').replaceWith(response);
+        $('#modal_screenshot').replaceWith(response);
+        $('#screenshot_blurry').replaceWith(response);
     });
 }
 
