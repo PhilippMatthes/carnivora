@@ -310,7 +310,7 @@ class Driver(threading.Thread):
             self.update_accounts_to_unfollow(author=author)
             self.update_followed_accounts(author=author)
 
-    def open_unfollow_screen(self, browser, log_path, timeout=5):
+    def open_unfollow_screen(self, browser, log_path, timeout=15):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
@@ -329,7 +329,7 @@ class Driver(threading.Thread):
         with open(self.interacting_users_path, "wb") as f:
             pickle.dump(self.interacting_users, f)
 
-    def check_follows(self, browser, log_path, timeout=5):
+    def check_follows(self, browser, log_path, timeout=15):
         if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
