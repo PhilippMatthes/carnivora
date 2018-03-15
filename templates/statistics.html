@@ -73,21 +73,18 @@ var chart_timeline = new Chart(ctx_timeline, {
         datasets: [
             {
                 label: 'Likes',
-                steppedLine: true,
                 data: {{ follows_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#1abc9c'
             },
             {
                 label: 'Follows',
-                steppedLine: true,
                 data: {{ follows_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#3498db'
             },
             {
                 label: 'Comments',
-                steppedLine: true,
                 data: {{ comments_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#9b59b6'

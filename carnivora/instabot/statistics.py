@@ -70,7 +70,7 @@ class Statistics:
         return amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments
 
     @staticmethod
-    def extract(actions_flattened, action_type, dateformat="%Y-%m-%d %H:%M:%S"):
+    def extract(actions_flattened, action_type, from_date, to_date, freq="30Min"):
         lst = [item["time"] for item in actions_flattened if item["type"] == action_type]
         if not lst:
             return [], []
@@ -78,28 +78,43 @@ class Statistics:
         df = pd.DataFrame({'time': lst, 'action_type': action_type})
         df = df.set_index(pd.DatetimeIndex(df['time']))
 
-        grouped = df.groupby(pd.TimeGrouper(freq='30Min')).size().to_frame()
+        if from_date:
+            df = df[(df['time'].dt > from_date)]
+        if to_date:
+            df = df[(df['time'].dt < to_date)]
 
-        dates_strings = [d.strftime(dateformat) for d in grouped.index.tolist()]
+        grouped = df.groupby(pd.TimeGrouper(freq=freq)).size().to_frame()
+
+        dates = grouped.index.tolist()
         quantities = grouped.values.tolist()
         quantities_flat = [item for sublist in quantities for item in sublist]
-        return dates_strings, quantities_flat
+        return dates, quantities_flat
 
     @staticmethod
-    def get_timelines(username):
+    def get_timelines(username, freq="30Min", from_date=None, to_date=None, dateformat="%Y-%m-%d %H:%M:%S"):
         actions = Statistics.get_actions(username)
         actions_flattened = list(chain.from_iterable([values for _, values in actions.items()]))
 
-        likes_dates_strings, likes_quantities = Statistics.extract(actions_flattened, action_type="like")
-        comments_dates_strings, comments_quantities = Statistics.extract(actions_flattened, action_type="comment")
-        follows_dates_strings, follows_quantities = Statistics.extract(actions_flattened, action_type="follow")
+        likes_dates, likes_quantities = Statistics.extract(actions_flattened, action_type="like",
+                                                           from_date=from_date, to_date=to_date,
+                                                           freq=freq)
+        comments_dates, comments_quantities = Statistics.extract(actions_flattened, action_type="comment",
+                                                                 from_date=from_date, to_date=to_date,
+                                                                 freq=freq)
+        follows_dates, follows_quantities = Statistics.extract(actions_flattened, action_type="follow",
+                                                               from_date=from_date, to_date=to_date,
+                                                               freq=freq)
 
-        likes_data = [{'x': x, 'y': y} for x, y in list(zip(likes_dates_strings, likes_quantities))]
-        comments_data = [{'x': x, 'y': y} for x, y in list(zip(comments_dates_strings, comments_quantities))]
-        follows_data = [{'x': x, 'y': y} for x, y in list(zip(follows_dates_strings, follows_quantities))]
+        likes_data = [{'x': x.strftime(dateformat), 'y': y}
+                      for x, y in list(zip(likes_dates, likes_quantities))]
+        comments_data = [{'x': x.strftime(dateformat), 'y': y}
+                         for x, y in list(zip(comments_dates, comments_quantities))]
+        follows_data = [{'x': x.strftime(dateformat), 'y': y}
+                        for x, y in list(zip(follows_dates, follows_quantities))]
 
-        index = list(likes_dates_strings)
-        index.extend(x for x in comments_dates_strings if x not in index)
-        index.extend(x for x in follows_dates_strings if x not in index)
+        index_dates = list(likes_dates)
+        index_dates.extend(x for x in comments_dates if x not in index_dates)
+        index_dates.extend(x for x in follows_dates if x not in index_dates)
+        index = [x.strftime(dateformat) for x in sorted(index_dates)]
 
         return index, likes_data, comments_data, follows_data
