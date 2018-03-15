@@ -14,6 +14,7 @@ from carnivora.instabot.driver import Driver
 from carnivora.instabot.log import Log
 from carnivora.instabot.statistics import Statistics
 from carnivora.instabot.statistics import frequencies
+from carnivora.instabot.statistics import timeranges
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
 from django.contrib.auth.decorators import user_passes_test
@@ -208,7 +209,11 @@ def statistics(request):
     try:
         freq = request.GET['freq']
     except (MultiValueDictKeyError, ValueError):
-        freq = "D"
+        freq = "Calendar day frequency"
+    try:
+        timerange = request.GET['timerange']
+    except (MultiValueDictKeyError, ValueError):
+        timerange = None
 
     hashtag_names, hashtag_scores = Statistics.get_hashtags(username=username, n=40, truncated_name_length=20)
 
@@ -216,9 +221,11 @@ def statistics(request):
         = Statistics.get_amount_of_actions(username=username)
     amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts(username=username)
 
-    index, likes_data, comments_data, follows_data = Statistics.get_timelines(username=username, freq=freq)
+    index, likes_data, comments_data, follows_data = Statistics.get_timelines(username=username, freq=freq,
+                                                                              timerange=timerange)
 
-    frequency_tuples = frequencies.items()
+    fr = frequencies.keys()
+    tr = timeranges.keys()
 
     render_data = {
         'hashtag_names': json.dumps(hashtag_names),
@@ -233,8 +240,10 @@ def statistics(request):
         'likes_data': likes_data,
         'comments_data': comments_data,
         'follows_data': follows_data,
-        'frequency_tuples': frequency_tuples,
-        'freq_name': frequencies[freq],
+        'frequencies': frequencies,
+        'freq': freq,
+        'timerange': timerange,
+        'timeranges': tr,
     }
     return render(request, 'statistics.html', render_data)
 

@@ -11,34 +11,45 @@ from carnivora.instabot.log import Log
 
 
 frequencies = {
-    "B": "Business day frequency",
-    "C": "Custom business day frequency",
-    "D": "Calendar day frequency",
-    "W": "Weekly frequency",
-    "M": "Month end frequency",
-    "SM": "Semi-month end frequency (15th and end of month)",
-    "BM": "Business month end frequency",
-    "CBM": "Custom business month end frequency",
-    "MS": "Month start frequency",
-    "SMS": "Semi-month start frequency (1st and 15th)",
-    "BMS": "Business month start frequency",
-    "CBMS": "Custom business month start frequency",
-    "Q": "Quarter end frequency",
-    "BQ": "Business quarter end frequency",
-    "QS": "Quarter start frequency",
-    "BQS": "Business quarter start frequency",
-    "Y": "Year end frequency",
-    "BA": "Business year end frequency",
-    "YS": "Year start frequency",
-    "BYS": "Business year start frequency",
-    "BH": "Business hour frequency",
-    "H": "Hourly frequency",
-    "T": "Minutely frequency",
-    "S": "Secondly frequency",
-    "L": "Milliseconds",
-    "U": "Microseconds",
-    "N": "Nanoseconds",
+    "Business day frequency": "B",
+    "Custom business day frequency": "C",
+    "Calendar day frequency": "D",
+    "Weekly frequency": "W",
+    "Month end frequency": "M",
+    "Semi-month end frequency (15th and end of month)": "SM",
+    "Business month end frequency": "BM",
+    "Custom business month end frequency": "CBM",
+    "Month start frequency": "MS",
+    "Semi-month start frequency (1st and 15th)": "SMS",
+    "Business month start frequency": "BMS",
+    "Custom business month start frequency": "CBMS",
+    "Quarter end frequency": "Q",
+    "Business quarter end frequency": "BQ",
+    "Quarter start frequency": "QS",
+    "Business quarter start frequency": "BQS",
+    "Year end frequency": "Y",
+    "Business year end frequency": "BA",
+    "Year start frequency": "YS",
+    "Business year start frequency": "BYS",
+    "Business hour frequency": "BH",
+    "Hourly frequency": "H",
+    "Minutely frequency": "T",
+    "Secondly frequency": "S",
+    "Milliseconds": "L",
+    "Microseconds": "U",
+    "Nanoseconds": "N",
 }
+
+timeranges = {
+    "Last month": 43800,
+    "Last day": 1440,
+    "Last hour": 60,
+    "Last minute": 1,
+    "Last 90 days": 129600,
+    "Last year": 525600,
+    "None": None,
+}
+
 
 class Statistics:
     @staticmethod
@@ -100,7 +111,7 @@ class Statistics:
         return amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments
 
     @staticmethod
-    def extract(actions_flattened, action_type, from_date, to_date, freq="D"):
+    def extract(actions_flattened, action_type, timerange, freq="Calendar day frequency"):
         lst = [item["time"] for item in actions_flattened if item["type"] == action_type]
         if not lst:
             return [], []
@@ -108,12 +119,10 @@ class Statistics:
         df = pd.DataFrame({'time': lst, 'action_type': action_type})
         df = df.set_index(pd.DatetimeIndex(df['time']))
 
-        if from_date:
-            df = df[(df['time'].dt > from_date)]
-        if to_date:
-            df = df[(df['time'].dt < to_date)]
+        if timerange and timerange != "None":
+            df = df[(df['time'] > datetime.now() - timedelta(minutes=timeranges[timerange]))]
 
-        grouped = df.groupby(pd.Grouper(freq=freq)).size().to_frame()
+        grouped = df.groupby(pd.Grouper(freq=frequencies[freq])).size().to_frame()
 
         dates = grouped.index.tolist()
         quantities = grouped.values.tolist()
@@ -121,19 +130,16 @@ class Statistics:
         return dates, quantities_flat
 
     @staticmethod
-    def get_timelines(username, freq="D", from_date=None, to_date=None, dateformat="%Y-%m-%d %H:%M:%S"):
+    def get_timelines(username, freq="Calendar day frequency", timerange=None, dateformat="%Y-%m-%d %H:%M:%S"):
         actions = Statistics.get_actions(username)
         actions_flattened = list(chain.from_iterable([values for _, values in actions.items()]))
 
         likes_dates, likes_quantities = Statistics.extract(actions_flattened, action_type="like",
-                                                           from_date=from_date, to_date=to_date,
-                                                           freq=freq)
+                                                           timerange=timerange, freq=freq)
         comments_dates, comments_quantities = Statistics.extract(actions_flattened, action_type="comment",
-                                                                 from_date=from_date, to_date=to_date,
-                                                                 freq=freq)
+                                                                 timerange=timerange, freq=freq)
         follows_dates, follows_quantities = Statistics.extract(actions_flattened, action_type="follow",
-                                                               from_date=from_date, to_date=to_date,
-                                                               freq=freq)
+                                                               timerange=timerange, freq=freq)
 
         likes_data = [{'x': x.strftime(dateformat), 'y': y}
                       for x, y in list(zip(likes_dates, likes_quantities))]

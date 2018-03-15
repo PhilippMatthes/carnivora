@@ -1,10 +1,21 @@
 <div class="ui search selection dropdown" id="frequency-dropdown">
-  <input type="hidden" name="frequency" id="freq" onchange="reload_statistics()">
+  <input type="hidden" name="frequency" id="freq" value="{{ freq }}" onchange="reload_statistics()">
   <i class="dropdown icon"></i>
-  <div class="default text">{{ freq_name }}</div>
+  <div class="default text">{{ freq }}</div>
   <div class="menu">
-      {% for t in frequency_tuples %}
-        <div class="item" data-value="{{ t.0 }}">{{ t.1 }}</div>
+      {% for f in frequencies %}
+        <div class="item" data-value="{{ f }}">{{ f }}</div>
+      {% endfor %}
+  </div>
+</div>
+
+<div class="ui search selection dropdown" id="timerange-dropdown">
+  <input type="hidden" name="timerange" id="timerange" value="{{ timerange }}" onchange="reload_statistics()">
+  <i class="dropdown icon"></i>
+  <div class="default text">{{ timerange }}</div>
+  <div class="menu">
+      {% for t in timeranges %}
+        <div class="item" data-value="{{ t }}">{{ t }}</div>
       {% endfor %}
   </div>
 </div>
@@ -56,14 +67,16 @@
 
 <script>
 $('#frequency-dropdown').dropdown();
+$('#timerange-dropdown').dropdown();
 
 function reload_statistics() {
     var freq = document.getElementById('freq').value;
+    var timerange = document.getElementById('timerange').value;
     var timeout = setTimeout(show_loading_indicator(), 500);
     $.ajax({
         type: "GET",
         url: '/statistics/',
-        data: {'freq': freq}
+        data: {'freq': freq, 'timerange': timerange}
     })
     .done(function(response) {
         $('#ajax-replace').html(response);
