@@ -168,14 +168,17 @@ class Driver(threading.Thread):
                 comment_field = WebDriverWait(browser, timeout).until(
                     ec.element_to_be_clickable((By.XPATH, Config.comment_xpath))
                 )
+                comment_button = WebDriverWait(browser, timeout).until(
+                    ec.element_to_be_clickable((By.XPATH, Config.comment_submit_xpath))
+                )
             except TimeoutException:
                 Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in comment')
                 return
             comment_field.click()
             actions = ActionChains(browser)
             actions.send_keys(say)
-            actions.send_keys(Keys.RETURN)
             actions.perform()
+            comment_button.click()
             Log.update(self.screenshot_path, self.browser, log_path, "Commented on "+str(author)+"s picture with: "+say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
 

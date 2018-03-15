@@ -19,6 +19,7 @@ standard_config = {
     "follow_xpath": "//*[contains(@class, '_qv64e _iokts _4tgw8 _njrw0')]",
     "unfollow_xpath": "//*[contains(@class, '_qv64e _t78yp _r9b8f _njrw0')]",
     "comment_xpath": "//*[contains(@class, '_bilrf')]",
+    "comment_submit_xpath": "//*[contains(@class, '_8scx2 coreSpriteComment')]",
     "error_xpath": "//*[contains(@class, 'error-container -cx-PRIVATE-ErrorPage__errorContainer')]",
     "author_xpath": "//*[contains(@class, '_2g7d5 notranslate _iadoq')]",
     "next_button_xpath": "//*[contains(@class, '_3a693 coreSpriteRightPaginationArrow')]",
@@ -82,6 +83,7 @@ class Config:
     follow_xpath = config["follow_xpath"]
     unfollow_xpath = config["unfollow_xpath"]
     comment_xpath = config["comment_xpath"]
+    comment_submit_xpath = config["comment_submit_xpath"]
     error_xpath = config["error_xpath"]
 
     author_xpath = config["author_xpath"]
