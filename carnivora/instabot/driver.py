@@ -88,6 +88,13 @@ class Driver(threading.Thread):
                 self.accounts_to_unfollow = []
                 pickle.dump([], f)
 
+        try:
+            from xvfbwrapper import Xvfb
+            self.vdisplay = Xvfb()
+            self.vdisplay.start()
+        except ImportError:
+            print("Selenium Webdriver will run without Xvfb. Install Xvfb to run Selenium Webdriver inside Xvfb.")
+
         self.browser = webdriver.PhantomJS()
         self.browser.set_window_size(window_width, window_height)
         self.screenshot_path = screenshot_path
@@ -497,4 +504,6 @@ class Driver(threading.Thread):
                 Log.update(self.screenshot_path, self.browser, self.log_path,
                            text='General Exception: ' + str(format_exc()))
         Log.update(self.screenshot_path, self.browser, self.log_path, text='Stopped bot')
+        if self.vdisplay:
+            self.vdisplay.stop()
         super(Driver, self).join()
