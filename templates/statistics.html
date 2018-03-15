@@ -69,27 +69,23 @@ var ctx_timeline = document.getElementById("timeline-chart").getContext('2d');
 var chart_timeline = new Chart(ctx_timeline, {
     type: 'line',
     data: {
-        labels: [
-            {{ likes_dates_strings|safe }},
-            {{ follows_dates_strings|safe }},
-            {{ comments_dates_strings|safe }}
-        ],
+        labels: {{ index|safe }},
         datasets: [
             {
                 label: 'Likes',
-                data: {{ likes_quantities }},
+                data: {{ follows_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#1abc9c'
             },
             {
                 label: 'Follows',
-                data: {{ follows_quantities }},
+                data: {{ follows_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#3498db'
             },
             {
                 label: 'Comments',
-                data: {{ comments_quantities }},
+                data: {{ comments_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#9b59b6'
             }

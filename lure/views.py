@@ -210,7 +210,7 @@ def statistics(request):
         = Statistics.get_amount_of_actions(username=username)
     amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts(username=username)
 
-    lds, lq, cds, cq, fds, fq = Statistics.get_timelines(username=username)
+    index, likes_data, comments_data, follows_data = Statistics.get_timelines(username=username)
 
     render_data = {
         'hashtag_names': json.dumps(hashtag_names),
@@ -221,12 +221,10 @@ def statistics(request):
         'amount_of_follows': amount_of_follows,
         'amount_of_interactions': amount_of_interactions,
         'amount_of_follows_all_time': amount_of_follows_all_time,
-        'likes_dates_strings': lds,
-        'likes_quantities': lq,
-        'comments_dates_strings': cds,
-        'comments_quantities': cq,
-        'follows_dates_strings': fds,
-        'follows_quantities': fq,
+        'index': index,
+        'likes_data': likes_data,
+        'comments_data': comments_data,
+        'follows_data': follows_data,
     }
     return render(request, 'statistics.html', render_data)
 
