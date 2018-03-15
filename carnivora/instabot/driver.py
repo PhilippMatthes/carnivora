@@ -469,7 +469,7 @@ class Driver(threading.Thread):
                                 break
                             if count > 10:
                                 break
-                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                            self.next_picture(browser=self.browser)
                             count += 1
                         if self.on_dialog_page(self.browser, self.log_path):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
@@ -478,16 +478,16 @@ class Driver(threading.Thread):
                                 sleep(Config.delay)
                                 self.store_hashtags(browser=self.browser, log_path=self.log_path)
 
-                                self.next_picture(browser=self.browser, log_path=self.log_path)
+                                self.next_picture(browser=self.browser)
                     for follows in range(2):
-                        self.next_picture(browser=self.browser, log_path=self.log_path)
+                        self.next_picture(browser=self.browser)
                         count = 0
                         while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
                             if not self.on_dialog_page(self.browser, self.log_path):
                                 break
                             if count > 10:
                                 break
-                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                            self.next_picture(browser=self.browser)
                             count += 1
                         if self.on_dialog_page(self.browser, self.log_path):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
