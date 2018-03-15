@@ -458,6 +458,9 @@ class Driver(threading.Thread):
 
                     delay, action = self.dispatcher.next_action()
 
+                    Log.update(self.screenshot_path, self.browser, self.log_path,
+                               "Dispatcher selected action: {} (Sleeping {}s)".format(action, delay))
+
                     sleep(delay)
 
                     if action == "comment":
