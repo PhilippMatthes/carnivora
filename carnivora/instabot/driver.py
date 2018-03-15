@@ -89,8 +89,11 @@ class Driver(threading.Thread):
 
         try:
             from xvfbwrapper import Xvfb
-            self.vdisplay = Xvfb()
-            self.vdisplay.start()
+            try:
+                self.vdisplay = Xvfb()
+                self.vdisplay.start()
+            except EnvironmentError:
+                print("Selenium Webdriver will run without Xvfb. There was an error starting Xvfb.")
         except ImportError:
             print("Selenium Webdriver will run without Xvfb. Install Xvfb to run Selenium Webdriver inside Xvfb.")
 
@@ -220,19 +223,11 @@ class Driver(threading.Thread):
             self.focus(first_picture, browser=browser)
             first_picture.click()
 
-    def next_picture(self, browser, log_path, timeout=5):
+    def next_picture(self, browser):
         if self.running():
-            try:
-                WebDriverWait(browser, timeout).until(
-                    ec.presence_of_element_located((By.XPATH, Config.next_button_xpath))
-                )
-                next_button = WebDriverWait(browser, timeout).until(
-                    ec.element_to_be_clickable((By.XPATH, Config.next_button_xpath))
-                )
-            except TimeoutException:
-                Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in next_picture')
-                return
-            next_button.click()
+            actions = ActionChains(browser)
+            actions.send_keys(Keys.ARROW_RIGHT)
+            actions.perform()
 
     def author(self, browser, log_path, timeout=5):
         if self.running():
@@ -469,9 +464,11 @@ class Driver(threading.Thread):
                         self.next_picture(browser=self.browser, log_path=self.log_path)
                     for likes in range(3):
                         count = 0
-                        while self.already_liked(browser=self.browser, log_path=self.log_path)\
-                                and count < 10\
-                                and self.on_dialog_page(self.browser, self.log_path):
+                        while self.already_liked(browser=self.browser, log_path=self.log_path):
+                            if not self.on_dialog_page(self.browser, self.log_path):
+                                break
+                            if count > 10:
+                                break
                             self.next_picture(browser=self.browser, log_path=self.log_path)
                             count += 1
                         if self.on_dialog_page(self.browser, self.log_path):
@@ -485,9 +482,11 @@ class Driver(threading.Thread):
                     for follows in range(2):
                         self.next_picture(browser=self.browser, log_path=self.log_path)
                         count = 0
-                        while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path))\
-                                and count < 10\
-                                and self.on_dialog_page(self.browser, self.log_path):
+                        while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
+                            if not self.on_dialog_page(self.browser, self.log_path):
+                                break
+                            if count > 10:
+                                break
                             self.next_picture(browser=self.browser, log_path=self.log_path)
                             count += 1
                         if self.on_dialog_page(self.browser, self.log_path):
