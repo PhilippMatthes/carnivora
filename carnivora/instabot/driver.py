@@ -461,7 +461,7 @@ class Driver(threading.Thread):
                             )
                             self.store_hashtags(browser=self.browser, log_path=self.log_path)
                             sleep(Config.delay)
-                        self.next_picture(browser=self.browser, log_path=self.log_path)
+                        self.next_picture(browser=self.browser)
                     for likes in range(3):
                         count = 0
                         while self.already_liked(browser=self.browser, log_path=self.log_path):
