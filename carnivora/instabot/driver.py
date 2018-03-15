@@ -18,6 +18,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 from carnivora.instabot.config import Config
+from carnivora.instabot.dispatcher import Dispatcher
 from carnivora.instabot.log import Log
 
 from tf_open_nsfw.classify_nsfw import classify_nsfw
@@ -100,6 +101,8 @@ class Driver(threading.Thread):
         self.browser = webdriver.PhantomJS()
         self.browser.set_window_size(window_width, window_height)
         self.screenshot_path = screenshot_path
+
+        self.dispatcher = Dispatcher(log_path=log_path)
 
         super(Driver, self).__init__()
 
@@ -452,17 +455,23 @@ class Driver(threading.Thread):
 
                     self.search(query=topic, browser=self.browser, log_path=self.log_path)
                     self.select_first(browser=self.browser, log_path=self.log_path)
-                    for comments in range(1):
+
+                    delay, action = self.dispatcher.next_action()
+
+                    sleep(delay)
+
+                    if action == "comment":
+                        self.next_picture(browser=self.browser)
                         if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                             self.comment(
                                 topic=topic,
                                 browser=self.browser,
                                 log_path=self.log_path
                             )
+                            self.dispatcher.log_action("comment")
                             self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                            sleep(Config.delay)
+                    elif action == "like":
                         self.next_picture(browser=self.browser)
-                    for likes in range(3):
                         count = 0
                         while self.already_liked(browser=self.browser, log_path=self.log_path):
                             if not self.on_dialog_page(self.browser, self.log_path):
@@ -475,11 +484,9 @@ class Driver(threading.Thread):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.like(topic=topic, browser=self.browser,
                                           log_path=self.log_path)
-                                sleep(Config.delay)
+                                self.dispatcher.log_action("like")
                                 self.store_hashtags(browser=self.browser, log_path=self.log_path)
-
-                                self.next_picture(browser=self.browser)
-                    for follows in range(2):
+                    elif action == "follow":
                         self.next_picture(browser=self.browser)
                         count = 0
                         while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
@@ -496,12 +503,13 @@ class Driver(threading.Thread):
                                     browser=self.browser,
                                     log_path=self.log_path
                                 )
-                                sleep(Config.delay)
+                                self.dispatcher.log_action("follow")
                                 self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                    if len(self.accounts_to_unfollow) > 50:
-                        for unfollows in range(2):
+                    elif action == "unfollow":
+                        if len(self.accounts_to_unfollow) > 50:
                             this_guy = self.accounts_to_unfollow[0]
                             self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
+                            self.dispatcher.log_action("unfollow")
                             del self.accounts_to_unfollow[0]
             except Exception:
                 Log.update(self.screenshot_path, self.browser, self.log_path,
