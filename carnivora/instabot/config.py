@@ -6,7 +6,6 @@ standard_config = {
     "bot_path": "carnivora/instabot/",
     "topics": ["graphics", "render", "cartoon", "daily", "art", "design", "cinema4d", "animation", "cg",
                "illustration", "3d", "corona", "octane", "rendering", "sculpting"],
-    "delay": 70,
     "start_url": "https://www.instagram.com/accounts/login/",
     "following_link": "https://www.instagram.com/{}/following/",
     "account_url": "https://www.instagram.com/{}/",
@@ -67,7 +66,6 @@ class Config:
     bot_path = config["bot_path"]
 
     topics = config["topics"]
-    delay = float(config["delay"])
     start_url = config["start_url"]
     following_link = config["following_link"]
     account_url = config["account_url"]
