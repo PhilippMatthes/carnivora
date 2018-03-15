@@ -456,62 +456,58 @@ class Driver(threading.Thread):
                     self.search(query=topic, browser=self.browser, log_path=self.log_path)
                     self.select_first(browser=self.browser, log_path=self.log_path)
 
-                    for m in range(10):
-                        delay, action = self.dispatcher.next_action()
+                    delay, action = self.dispatcher.next_action()
 
-                        sleep(delay)
+                    sleep(delay)
 
-                        if action == "comment":
+                    if action == "comment":
+                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                            self.comment(
+                                topic=topic,
+                                browser=self.browser,
+                                log_path=self.log_path
+                            )
+                            self.dispatcher.log_action("comment")
+                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
+                    elif action == "like":
+                        count = 0
+                        while self.already_liked(browser=self.browser, log_path=self.log_path):
+                            if not self.on_dialog_page(self.browser, self.log_path):
+                                break
+                            if count > 10:
+                                break
                             self.next_picture(browser=self.browser)
+                            count += 1
+                        if self.on_dialog_page(self.browser, self.log_path):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                                self.comment(
+                                self.like(topic=topic, browser=self.browser,
+                                          log_path=self.log_path)
+                                self.dispatcher.log_action("like")
+                                self.store_hashtags(browser=self.browser, log_path=self.log_path)
+                    elif action == "follow":
+                        count = 0
+                        while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
+                            if not self.on_dialog_page(self.browser, self.log_path):
+                                break
+                            if count > 10:
+                                break
+                            self.next_picture(browser=self.browser)
+                            count += 1
+                        if self.on_dialog_page(self.browser, self.log_path):
+                            if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                                self.follow(
                                     topic=topic,
                                     browser=self.browser,
                                     log_path=self.log_path
                                 )
-                                self.dispatcher.log_action("comment")
+                                self.dispatcher.log_action("follow")
                                 self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                        elif action == "like":
-                            self.next_picture(browser=self.browser)
-                            count = 0
-                            while self.already_liked(browser=self.browser, log_path=self.log_path):
-                                if not self.on_dialog_page(self.browser, self.log_path):
-                                    break
-                                if count > 10:
-                                    break
-                                self.next_picture(browser=self.browser)
-                                count += 1
-                            if self.on_dialog_page(self.browser, self.log_path):
-                                if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                                    self.like(topic=topic, browser=self.browser,
-                                              log_path=self.log_path)
-                                    self.dispatcher.log_action("like")
-                                    self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                        elif action == "follow":
-                            self.next_picture(browser=self.browser)
-                            count = 0
-                            while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path)):
-                                if not self.on_dialog_page(self.browser, self.log_path):
-                                    break
-                                if count > 10:
-                                    break
-                                self.next_picture(browser=self.browser)
-                                count += 1
-                            if self.on_dialog_page(self.browser, self.log_path):
-                                if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                                    self.follow(
-                                        topic=topic,
-                                        browser=self.browser,
-                                        log_path=self.log_path
-                                    )
-                                    self.dispatcher.log_action("follow")
-                                    self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                        elif action == "unfollow":
-                            if len(self.accounts_to_unfollow) > 50:
-                                this_guy = self.accounts_to_unfollow[0]
-                                self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
-                                self.dispatcher.log_action("unfollow")
-                                del self.accounts_to_unfollow[0]
+                    elif action == "unfollow":
+                        if len(self.accounts_to_unfollow) > 50:
+                            this_guy = self.accounts_to_unfollow[0]
+                            self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
+                            self.dispatcher.log_action("unfollow")
+                            del self.accounts_to_unfollow[0]
             except Exception:
                 Log.update(self.screenshot_path, self.browser, self.log_path,
                            text='General Exception: ' + str(format_exc()))
