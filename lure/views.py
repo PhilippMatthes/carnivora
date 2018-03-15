@@ -13,6 +13,7 @@ from carnivora.instabot.config import ConfigLoader, Config
 from carnivora.instabot.driver import Driver
 from carnivora.instabot.log import Log
 from carnivora.instabot.statistics import Statistics
+from carnivora.instabot.statistics import frequencies
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
 from django.contrib.auth.decorators import user_passes_test
@@ -204,13 +205,20 @@ def statistics(request):
         return
     username = request.user.username
 
+    try:
+        freq = request.GET['freq']
+    except (MultiValueDictKeyError, ValueError):
+        freq = "D"
+
     hashtag_names, hashtag_scores = Statistics.get_hashtags(username=username, n=40, truncated_name_length=20)
 
     amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments \
         = Statistics.get_amount_of_actions(username=username)
     amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts(username=username)
 
-    index, likes_data, comments_data, follows_data = Statistics.get_timelines(username=username)
+    index, likes_data, comments_data, follows_data = Statistics.get_timelines(username=username, freq=freq)
+
+    frequency_tuples = frequencies.items()
 
     render_data = {
         'hashtag_names': json.dumps(hashtag_names),
@@ -225,6 +233,8 @@ def statistics(request):
         'likes_data': likes_data,
         'comments_data': comments_data,
         'follows_data': follows_data,
+        'frequency_tuples': frequency_tuples,
+        'freq_name': frequencies[freq],
     }
     return render(request, 'statistics.html', render_data)
 

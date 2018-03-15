@@ -10,6 +10,36 @@ from carnivora.instabot.config import Config
 from carnivora.instabot.log import Log
 
 
+frequencies = {
+    "B": "Business day frequency",
+    "C": "Custom business day frequency",
+    "D": "Calendar day frequency",
+    "W": "Weekly frequency",
+    "M": "Month end frequency",
+    "SM": "Semi-month end frequency (15th and end of month)",
+    "BM": "Business month end frequency",
+    "CBM": "Custom business month end frequency",
+    "MS": "Month start frequency",
+    "SMS": "Semi-month start frequency (1st and 15th)",
+    "BMS": "Business month start frequency",
+    "CBMS": "Custom business month start frequency",
+    "Q": "Quarter end frequency",
+    "BQ": "Business quarter end frequency",
+    "QS": "Quarter start frequency",
+    "BQS": "Business quarter start frequency",
+    "Y": "Year end frequency",
+    "BA": "Business year end frequency",
+    "YS": "Year start frequency",
+    "BYS": "Business year start frequency",
+    "BH": "Business hour frequency",
+    "H": "Hourly frequency",
+    "T": "Minutely frequency",
+    "S": "Secondly frequency",
+    "L": "Milliseconds",
+    "U": "Microseconds",
+    "N": "Nanoseconds",
+}
+
 class Statistics:
     @staticmethod
     def get_hashtags(username, n=40, truncated_name_length=100):
@@ -18,7 +48,7 @@ class Statistics:
             log_path = Config.bot_path + "log/" + username
             with open(log_path + "/hashtags.pickle", "rb") as f:
                 hashtags = pickle.load(f)
-        except:
+        except FileNotFoundError:
             for h in Config.topics:
                 hashtags[h] = 2
         tuples = sorted(hashtags.items(), key=operator.itemgetter(1), reverse=True)
@@ -70,7 +100,7 @@ class Statistics:
         return amount_of_users, amount_of_interactions, amount_of_likes, amount_of_follows, amount_of_comments
 
     @staticmethod
-    def extract(actions_flattened, action_type, from_date, to_date, freq="30Min"):
+    def extract(actions_flattened, action_type, from_date, to_date, freq="D"):
         lst = [item["time"] for item in actions_flattened if item["type"] == action_type]
         if not lst:
             return [], []
@@ -83,7 +113,7 @@ class Statistics:
         if to_date:
             df = df[(df['time'].dt < to_date)]
 
-        grouped = df.groupby(pd.TimeGrouper(freq=freq)).size().to_frame()
+        grouped = df.groupby(pd.Grouper(freq=freq)).size().to_frame()
 
         dates = grouped.index.tolist()
         quantities = grouped.values.tolist()
@@ -91,7 +121,7 @@ class Statistics:
         return dates, quantities_flat
 
     @staticmethod
-    def get_timelines(username, freq="30Min", from_date=None, to_date=None, dateformat="%Y-%m-%d %H:%M:%S"):
+    def get_timelines(username, freq="D", from_date=None, to_date=None, dateformat="%Y-%m-%d %H:%M:%S"):
         actions = Statistics.get_actions(username)
         actions_flattened = list(chain.from_iterable([values for _, values in actions.items()]))
 
