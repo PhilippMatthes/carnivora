@@ -75,9 +75,6 @@ class Statistics:
         if not lst:
             return [], []
 
-        for i in range(100):
-            lst.append(datetime.now() - timedelta(minutes=i))
-
         df = pd.DataFrame({'time': lst, 'action_type': action_type})
         df = df.set_index(pd.DatetimeIndex(df['time']))
 
