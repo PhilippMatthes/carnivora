@@ -76,27 +76,28 @@ var chart_timeline = new Chart(ctx_timeline, {
                 steppedLine: true,
                 data: {{ follows_data|safe }},
                 borderWidth: 1,
-                backgroundColor: rgba(26, 188, 156,0.2)
+                backgroundColor: '#1abc9c'
             },
             {
                 label: 'Follows',
                 steppedLine: true,
                 data: {{ follows_data|safe }},
                 borderWidth: 1,
-                backgroundColor: rgba(52, 152, 219,0.2)
+                backgroundColor: '#3498db'
             },
             {
                 label: 'Comments',
                 steppedLine: true,
                 data: {{ comments_data|safe }},
                 borderWidth: 1,
-                backgroundColor: rgba(155, 89, 182,0.2)
+                backgroundColor: '#9b59b6'
             }
         ]
     },
     options: {
         scales: {
             yAxes: [{
+                stacked: true,
                 ticks: {
                     beginAtZero:true
                 }
