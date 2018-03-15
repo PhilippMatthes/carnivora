@@ -9,7 +9,6 @@ from time import sleep
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys  # For input processing
 from random import randint
@@ -156,6 +155,18 @@ class Driver(threading.Thread):
         with open(self.action_list_path, "wb") as f:
             pickle.dump(self.action_list, f)
 
+    def on_dialog_page(self, browser, log_path, check_timeout=1):
+        if self.running():
+            try:
+                WebDriverWait(browser, check_timeout).until(
+                    ec.presence_of_element_located((By.XPATH, Config.dialog_xpath))
+                )
+            except (TimeoutException, NoSuchElementException):
+                Log.update(self.screenshot_path, self.browser, log_path, 'No longer on dialog page.')
+                return False
+            else:
+                return True
+
     def comment(self, topic, browser, log_path, timeout=5):
         if self.running():
             author = self.author(browser=browser, log_path=log_path)
@@ -186,17 +197,6 @@ class Driver(threading.Thread):
         if self.running():
             browser.get("https://www.instagram.com/explore/tags/" + query + "/")
             Log.update(self.screenshot_path, self.browser, log_path, "Searching for " + query + ".")
-
-    def error(self, browser, log_path, error_timeout=1):
-        if self.running():
-            try:
-                error_message = WebDriverWait(browser, error_timeout).until(
-                    ec.presence_of_element_located((By.XPATH, Config.error_xpath))
-                )
-                Log.update(self.screenshot_path, self.browser, log_path, 'Page loading error: ' + str(error_message))
-                return True
-            except TimeoutException:
-                return False
 
     # Selects the first picture in a loaded topic screen
     def select_first(self, browser, log_path, timeout=5):
@@ -458,38 +458,39 @@ class Driver(threading.Thread):
                     self.search(query=topic, browser=self.browser, log_path=self.log_path)
                     self.select_first(browser=self.browser, log_path=self.log_path)
                     for comments in range(1):
-                        if not self.error(browser=self.browser, log_path=self.log_path):
-                            if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
-                                self.comment(
-                                    topic=topic,
-                                    browser=self.browser,
-                                    log_path=self.log_path
-                                )
-                                self.store_hashtags(browser=self.browser, log_path=self.log_path)
-                                sleep(Config.delay)
-                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                        if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
+                            self.comment(
+                                topic=topic,
+                                browser=self.browser,
+                                log_path=self.log_path
+                            )
+                            self.store_hashtags(browser=self.browser, log_path=self.log_path)
+                            sleep(Config.delay)
+                        self.next_picture(browser=self.browser, log_path=self.log_path)
                     for likes in range(3):
-                        if not self.error(browser=self.browser, log_path=self.log_path):
-                            count = 0
-                            while self.already_liked(browser=self.browser, log_path=self.log_path) and count < 10:
-                                self.next_picture(browser=self.browser, log_path=self.log_path)
-                                count += 1
-
+                        count = 0
+                        while self.already_liked(browser=self.browser, log_path=self.log_path)\
+                                and count < 10\
+                                and self.on_dialog_page(self.browser, self.log_path):
+                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                            count += 1
+                        if self.on_dialog_page(self.browser, self.log_path):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.like(topic=topic, browser=self.browser,
                                           log_path=self.log_path)
                                 sleep(Config.delay)
                                 self.store_hashtags(browser=self.browser, log_path=self.log_path)
 
-                            self.next_picture(browser=self.browser, log_path=self.log_path)
-                    for follows in range(2):
-                        if not self.error(browser=self.browser, log_path=self.log_path):
-                            self.next_picture(browser=self.browser, log_path=self.log_path)
-                            count = 0
-                            while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path))\
-                                    and count < 10:
                                 self.next_picture(browser=self.browser, log_path=self.log_path)
-                                count += 1
+                    for follows in range(2):
+                        self.next_picture(browser=self.browser, log_path=self.log_path)
+                        count = 0
+                        while self.user_followed_already(self.author(browser=self.browser, log_path=self.log_path))\
+                                and count < 10\
+                                and self.on_dialog_page(self.browser, self.log_path):
+                            self.next_picture(browser=self.browser, log_path=self.log_path)
+                            count += 1
+                        if self.on_dialog_page(self.browser, self.log_path):
                             if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                                 self.follow(
                                     topic=topic,

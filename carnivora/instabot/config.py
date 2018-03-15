@@ -21,6 +21,7 @@ standard_config = {
     "comment_xpath": "//*[contains(@class, '_bilrf')]",
     "comment_submit_xpath": "//*[contains(@class, '_8scx2 coreSpriteComment')]",
     "error_xpath": "//*[contains(@class, 'error-container -cx-PRIVATE-ErrorPage__errorContainer')]",
+    "dialog_xpath": "//*[contains(@class, '_pfyik _lz8g1')]",
     "author_xpath": "//*[contains(@class, '_2g7d5 notranslate _iadoq')]",
     "next_button_xpath": "//*[contains(@class, '_3a693 coreSpriteRightPaginationArrow')]",
     "like_button_xpath": "//*[contains(@class, '_8scx2 coreSpriteHeartOpen')]",
@@ -85,6 +86,8 @@ class Config:
     comment_xpath = config["comment_xpath"]
     comment_submit_xpath = config["comment_submit_xpath"]
     error_xpath = config["error_xpath"]
+
+    dialog_xpath = config["dialog_xpath"]
 
     author_xpath = config["author_xpath"]
     next_button_xpath = config["next_button_xpath"]
