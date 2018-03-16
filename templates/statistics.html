@@ -1,13 +1,3 @@
-<div class="ui search selection dropdown" id="frequency-dropdown">
-  <input type="hidden" name="frequency" id="freq" value="{{ freq }}" onchange="reload_statistics()">
-  <i class="dropdown icon"></i>
-  <div class="default text">{{ freq }}</div>
-  <div class="menu">
-      {% for f in frequencies %}
-        <div class="item" data-value="{{ f }}">{{ f }}</div>
-      {% endfor %}
-  </div>
-</div>
 
 <div class="ui segment grid">
     <div class="eight wide column">
@@ -24,6 +14,18 @@
     </div>
 </div>
 
+<div class="ui segment">
+<div class="ui search selection dropdown" id="frequency-dropdown">
+  <input type="hidden" name="frequency" id="freq" value="{{ freq }}" onchange="reload_statistics()">
+  <i class="dropdown icon"></i>
+  <div class="default text">{{ freq }}</div>
+  <div class="menu">
+      {% for f in frequencies %}
+        <div class="item" data-value="{{ f }}">{{ f }}</div>
+      {% endfor %}
+  </div>
+</div>
+
 <div class="ui search selection dropdown" id="timerange-dropdown">
   <input type="hidden" name="timerange" id="timerange" value="{{ timerange }}" onchange="reload_statistics()">
   <i class="dropdown icon"></i>
@@ -35,7 +37,10 @@
   </div>
 </div>
 
-<canvas class="ui segment" id="timeline-chart"></canvas>
+
+<canvas id="timeline-chart"></canvas>
+</div>
+
 
 <div class="ui segment grid">
   <div class="eight wide column">
@@ -166,7 +171,7 @@ new Chart(document.getElementById("pie-chart-likes"), {
       datasets: [{
         label: "Likes",
         backgroundColor: ["#1abc9c", "#34495e"],
-        data: [{{ remaining_likes }}, {{ current_likes }}]
+        data: [{{ current_likes }}, {{ remaining_likes }}]
       }]
     },
     options: {
@@ -183,7 +188,7 @@ new Chart(document.getElementById("pie-chart-follows"), {
       datasets: [{
         label: "Follows",
         backgroundColor: ["#3498db", "#34495e"],
-        data: [{{ remaining_follows }}, {{ current_follows }}]
+        data: [{{ current_follows }}, {{ remaining_follows }}]
       }]
     },
     options: {
@@ -200,7 +205,7 @@ new Chart(document.getElementById("pie-chart-comments"), {
       datasets: [{
         label: "Comments",
         backgroundColor: ["#9b59b6", "#34495e"],
-        data: [{{ remaining_comments }}, {{ current_comments }}]
+        data: [{{ current_comments }}, {{ remaining_comments }}]
       }]
     },
     options: {
@@ -217,7 +222,7 @@ new Chart(document.getElementById("pie-chart-unfollows"), {
       datasets: [{
         label: "Unfollows",
         backgroundColor: ["#2ecc71", "#34495e"],
-        data: [{{ remaining_unfollows }}, {{ current_unfollows }}]
+        data: [{{ current_unfollows }}, {{ remaining_unfollows }}]
       }]
     },
     options: {
