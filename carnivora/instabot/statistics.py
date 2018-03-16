@@ -7,6 +7,7 @@ from enum import Enum
 import pandas as pd
 
 from carnivora.instabot.config import Config
+from carnivora.instabot.dispatcher import Dispatcher
 from carnivora.instabot.log import Log
 
 
@@ -154,3 +155,28 @@ class Statistics:
         index = [x.strftime(dateformat) for x in sorted(index_dates)]
 
         return index, likes_data, comments_data, follows_data
+
+    @staticmethod
+    def get_dispatch_statistics(username, max_likes=600, max_comments=200, max_follows=400, max_unfollows=400):
+        log_path = Config.bot_path + "log/" + username
+        dispatcher = Dispatcher(
+            log_path=log_path,
+            max_likes=max_likes,
+            max_comments=max_comments,
+            max_follows=max_follows,
+            max_unfollows=max_unfollows
+        )
+        dispatch_log = dispatcher.load_log_file()
+        current_likes = dispatch_log["like"]
+        current_follows = dispatch_log["follow"]
+        current_comments = dispatch_log["comment"]
+        current_unfollows = dispatch_log["unfollow"]
+        remaining_likes = max_likes - current_likes
+        remaining_follows = max_follows - current_follows
+        remaining_comments = max_comments - current_comments
+        remaining_unfollows = max_unfollows - current_unfollows
+        return \
+            current_likes, remaining_likes,\
+            current_follows, remaining_follows,\
+            current_comments, remaining_comments,\
+            current_unfollows, remaining_unfollows

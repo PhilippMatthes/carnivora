@@ -221,8 +221,16 @@ def statistics(request):
         = Statistics.get_amount_of_actions(username=username)
     amount_of_follows_all_time = Statistics.get_amount_of_followed_accounts(username=username)
 
-    index, likes_data, comments_data, follows_data = Statistics.get_timelines(username=username, freq=freq,
-                                                                              timerange=timerange)
+    index, likes_data, comments_data, follows_data = Statistics.get_timelines(
+        username=username,
+        freq=freq,
+        timerange=timerange
+    )
+
+    current_likes, remaining_likes, \
+    current_follows, remaining_follows, \
+    current_comments, remaining_comments, \
+    current_unfollows, remaining_unfollows = Statistics.get_dispatch_statistics(username=username)
 
     fr = frequencies.keys()
     tr = timeranges.keys()
@@ -244,6 +252,14 @@ def statistics(request):
         'freq': freq,
         'timerange': timerange,
         'timeranges': tr,
+        'current_likes': current_likes,
+        'current_follows': current_follows,
+        'current_comments': current_comments,
+        'current_unfollows': current_unfollows,
+        'remaining_likes': remaining_likes,
+        'remaining_follows': remaining_follows,
+        'remaining_comments': remaining_comments,
+        'remaining_unfollows': remaining_unfollows,
     }
     return render(request, 'statistics.html', render_data)
 

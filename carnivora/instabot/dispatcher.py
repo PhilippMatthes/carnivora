@@ -8,7 +8,7 @@ STRUCTURE = {"date_ordinal": None, "like": 0, "follow": 0, "comment": 0, "unfoll
 
 class Dispatcher:
     def __init__(self, log_path, max_likes=600, max_follows=400, max_comments=200, max_unfollows=400):
-        self.log_file = log_path+"/dispatch_file.pickle"
+        self.log_file = log_path + "/dispatch_file.pickle"
         self.dispatch_log = self.load_log_file()
         self.max_likes = max_likes
         self.max_follows = max_follows
@@ -47,11 +47,11 @@ class Dispatcher:
         seconds = Dispatcher.seconds_until_midnight(date=datetime.datetime.now())
 
         l = [likes_quotient, follows_quotient, comments_quotient, unfollows_quotient]
-        if l[0] >= sum(l)/len(l) and l[0] != 0:
+        if l[0] >= sum(l) / len(l) and l[0] != 0:
             delay, action = seconds / likes_left, "like"
-        elif l[1] >= sum(l)/len(l) and l[0] != 0:
+        elif l[1] >= sum(l) / len(l) and l[0] != 0:
             delay, action = seconds / follows_left, "follow"
-        elif l[2] >= sum(l)/len(l) and l[0] != 0:
+        elif l[2] >= sum(l) / len(l) and l[0] != 0:
             delay, action = seconds / comments_left, "comment"
         elif l[3] != 0:
             delay, action = seconds / unfollows_left, "unfollow"

@@ -288,6 +288,7 @@ class Driver(threading.Thread):
                 Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in unfollow')
                 return
             unfollow_button.click()
+            Log.update(self.screenshot_path, self.browser, log_path, "Unfollowed: " + name)
 
     def update_accounts_to_unfollow(self, author):
         self.accounts_to_unfollow.append(author)

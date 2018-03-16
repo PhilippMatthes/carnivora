@@ -9,6 +9,21 @@
   </div>
 </div>
 
+<div class="ui segment grid">
+    <div class="eight wide column">
+        <canvas id="pie-chart-likes"></canvas>
+    </div>
+    <div class="eight wide column">
+        <canvas id="pie-chart-follows"></canvas>
+    </div>
+    <div class="eight wide column">
+        <canvas id="pie-chart-comments"></canvas>
+    </div>
+    <div class="eight wide column">
+        <canvas id="pie-chart-unfollows"></canvas>
+    </div>
+</div>
+
 <div class="ui search selection dropdown" id="timerange-dropdown">
   <input type="hidden" name="timerange" id="timerange" value="{{ timerange }}" onchange="reload_statistics()">
   <i class="dropdown icon"></i>
@@ -114,7 +129,7 @@ var chart_timeline = new Chart(ctx_timeline, {
         datasets: [
             {
                 label: 'Likes',
-                data: {{ follows_data|safe }},
+                data: {{ likes_data|safe }},
                 borderWidth: 1,
                 backgroundColor: '#1abc9c'
             },
@@ -141,6 +156,75 @@ var chart_timeline = new Chart(ctx_timeline, {
                 }
             }]
         }
+    }
+});
+
+new Chart(document.getElementById("pie-chart-likes"), {
+    type: 'pie',
+    data: {
+      labels: ["Likes performed", "Likes to go"],
+      datasets: [{
+        label: "Likes",
+        backgroundColor: ["#1abc9c", "#34495e"],
+        data: [{{ remaining_likes }}, {{ current_likes }}]
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Dispatch statistics for likes'
+      }
+    }
+});
+new Chart(document.getElementById("pie-chart-follows"), {
+    type: 'pie',
+    data: {
+      labels: ["Follows performed", "Follows to go"],
+      datasets: [{
+        label: "Follows",
+        backgroundColor: ["#3498db", "#34495e"],
+        data: [{{ remaining_follows }}, {{ current_follows }}]
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Dispatch statistics for follows'
+      }
+    }
+});
+new Chart(document.getElementById("pie-chart-comments"), {
+    type: 'pie',
+    data: {
+      labels: ["Comments performed", "Comments to go"],
+      datasets: [{
+        label: "Comments",
+        backgroundColor: ["#9b59b6", "#34495e"],
+        data: [{{ remaining_comments }}, {{ current_comments }}]
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Dispatch statistics for comments'
+      }
+    }
+});
+new Chart(document.getElementById("pie-chart-unfollows"), {
+    type: 'pie',
+    data: {
+      labels: ["Unfollows performed", "Unfollows to go"],
+      datasets: [{
+        label: "Unfollows",
+        backgroundColor: ["#2ecc71", "#34495e"],
+        data: [{{ remaining_unfollows }}, {{ current_unfollows }}]
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Dispatch statistics for unfollows'
+      }
     }
 });
 </script>
