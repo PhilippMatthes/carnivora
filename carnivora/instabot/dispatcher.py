@@ -30,7 +30,7 @@ class Dispatcher:
     def seconds_until_midnight(date):
         return ((24 - date.hour - 1) * 60 * 60) + ((60 - date.minute - 1) * 60) + (60 - date.second)
 
-    def next_action(self):
+    def next_action(self, safe_delay=10):
         self.check_log_file()
         self.dispatch_log = self.load_log_file()
 
@@ -65,7 +65,7 @@ class Dispatcher:
         else:
             return 60, "sleep"
 
-        return delay, action
+        return max(safe_delay, delay), action
 
     def log_action(self, action):
         self.dispatch_log[action] += 1
