@@ -44,19 +44,26 @@ class Dispatcher:
         comments_quotient = comments_left / self.max_comments if comments_left != 0 else 0
         unfollows_quotient = unfollows_left / self.max_unfollows if unfollows_left != 0 else 0
 
+        actions_left = likes_left + follows_left + comments_left + unfollows_left
+
         seconds = Dispatcher.seconds_until_midnight(date=datetime.datetime.now())
+
+        if actions_left != 0:
+            delay = seconds / actions_left
+        else:
+            return 60, "sleep"
 
         l = [likes_quotient, follows_quotient, comments_quotient, unfollows_quotient]
         if l[0] >= sum(l) / len(l) and l[0] != 0:
-            delay, action = seconds / likes_left, "like"
+            action = "like"
         elif l[1] >= sum(l) / len(l) and l[0] != 0:
-            delay, action = seconds / follows_left, "follow"
+            action = "follow"
         elif l[2] >= sum(l) / len(l) and l[0] != 0:
-            delay, action = seconds / comments_left, "comment"
+            action = "comment"
         elif l[3] != 0:
-            delay, action = seconds / unfollows_left, "unfollow"
+            action = "unfollow"
         else:
-            return "sleep", 0
+            return 60, "sleep"
 
         return delay, action
 
