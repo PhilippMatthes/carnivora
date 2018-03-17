@@ -49,7 +49,7 @@ class Dispatcher:
         seconds = Dispatcher.seconds_until_midnight(date=datetime.datetime.now())
 
         if actions_left != 0:
-            delay = seconds / actions_left
+            delay = (seconds / actions_left) / 2
         else:
             return 60, "sleep"
 
