@@ -510,8 +510,9 @@ class Driver(threading.Thread):
                         if len(self.accounts_to_unfollow) > 50:
                             this_guy = self.accounts_to_unfollow[0]
                             self.unfollow(name=this_guy, browser=self.browser, log_path=self.log_path)
-                            self.dispatcher.log_action("unfollow")
                             del self.accounts_to_unfollow[0]
+                        self.dispatcher.log_action("unfollow")
+
             except Exception:
                 Log.update(self.screenshot_path, self.browser, self.log_path,
                            text='General Exception: ' + str(format_exc()))
