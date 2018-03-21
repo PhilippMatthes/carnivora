@@ -15,6 +15,7 @@ from carnivora.instabot.log import Log
 from carnivora.instabot.statistics import Statistics
 from carnivora.instabot.statistics import frequencies
 from carnivora.instabot.statistics import timeranges
+from tf_imagenet.imagenet import classify_image
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
 from django.contrib.auth.decorators import user_passes_test
@@ -266,10 +267,14 @@ def statistics(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def submit_nsfw(request):
+    if not request.user.is_authenticated:
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': 0})
+    username = request.user.username
     try:
         link = request.GET['nsfw_link']
         sfw, nsfw = classify_nsfw(link)
-        return render(request, 'nsfw_progress_bar.html', {'nsfw': int(nsfw * 100)})
+        top_k = classify_image(image_url=link, num_predictions=5, username=username)
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': int(nsfw * 100), 'top_k': top_k})
     except MultiValueDictKeyError as e:
         print(e)
         return render(request, 'nsfw_progress_bar.html', {'nsfw': 0})

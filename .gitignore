@@ -12,6 +12,9 @@ log.pickle
 running.pickle
 config.pickle
 
+tf_imagenet/images
+tf_imagenet/tmp
+
 img/
 !placeholder-image.png
 

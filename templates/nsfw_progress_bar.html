@@ -7,6 +7,20 @@
         <div class="label">{{ nsfw }}% NSFW</div>
     </div>
 </div>
+
+<table class="ui table">
+  <tr>
+    <th>Probability</th>
+    <th>Identifier</th>
+  </tr>
+    {% for k in top_k %}
+  <tr>
+    <td>{{ k.0 }}</td>
+    <td>{{ k.1 }}</td>
+  </tr>
+    {% endfor %}
+</table>
+
 <script>
     $('#nsfw').progress({
         label: 'ratio',
