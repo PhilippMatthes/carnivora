@@ -233,7 +233,6 @@ def statistics(request):
     current_comments, remaining_comments, \
     current_unfollows, remaining_unfollows = Statistics.get_dispatch_statistics(username=username)
 
-    fr = frequencies.keys()
     tr = timeranges.keys()
 
     render_data = {
@@ -292,7 +291,8 @@ def nsfw_check(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def perform_reboot(request):
-    os.system('sudo reboot now')
+    os.system('touch '+__file__)
+    return None
 
 
 @user_passes_test(lambda u: u.is_superuser)

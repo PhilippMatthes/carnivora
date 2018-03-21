@@ -13,7 +13,6 @@ class LureConfig(AppConfig):
         # print("Logging out all users...")
         # from django.contrib.sessions.models import Session
         # Session.objects.all().delete()
-
         print("Resetting all flags...")
         log_directory = Config.bot_path + "log/"
         if os.path.exists(log_directory):
