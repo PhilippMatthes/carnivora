@@ -20,6 +20,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from carnivora.instabot.config import Config
 from carnivora.instabot.dispatcher import Dispatcher
 from carnivora.instabot.log import Log
+from tf_imagenet.imagenet import classify_image
 
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
@@ -428,20 +429,26 @@ class Driver(threading.Thread):
                     return
                 return image.get_attribute("src")
 
-    def post_is_sfw(self, browser, log_path):
+    def post_is_sfw(self, browser, log_path, limit=0.1):
         if self.running():
             image_url = self.extract_picture_source(browser=browser, log_path=log_path)
             if not image_url:
+                Log.update(
+                    screenshot_path=self.screenshot_path,
+                    browser=self.browser,
+                    log_path=self.log_path,
+                    text="Picture source could not be extracted."
+                )
                 return True
             sfw, nsfw = classify_nsfw(image_url)
             Log.update(
                 screenshot_path=self.screenshot_path,
                 browser=self.browser,
                 log_path=self.log_path,
-                text="Analysis of this post yielded it to be {}% NSFW.".format(int(100 * nsfw)),
+                text="Analysis of this post yielded it to be {}% SFW.".format(int(100 * sfw)),
                 image=image_url
             )
-            return nsfw < sfw
+            return nsfw < limit
 
     def run(self):
         self.login(browser=self.browser, log_path=self.log_path, password=self.password, username=self.username)

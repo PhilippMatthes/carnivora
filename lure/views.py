@@ -268,15 +268,27 @@ def statistics(request):
 def submit_nsfw(request):
     if not request.user.is_authenticated:
         return render(request, 'nsfw_progress_bar.html', {'nsfw': 0})
-    username = request.user.username
     try:
         link = request.GET['nsfw_link']
         sfw, nsfw = classify_nsfw(link)
-        top_k = classify_image(image_url=link, num_predictions=5, username=username)
-        return render(request, 'nsfw_progress_bar.html', {'nsfw': int(nsfw * 100), 'top_k': top_k})
+        return render(request, 'nsfw_progress_bar.html', {'nsfw': int(nsfw * 100)})
     except MultiValueDictKeyError as e:
         print(e)
         return render(request, 'nsfw_progress_bar.html', {'nsfw': 0})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def submit_to_classification(request):
+    if not request.user.is_authenticated:
+        return render(request, 'image_classification.html', {'top_k': []})
+    username = request.user.username
+    try:
+        link = request.GET['link']
+        top_k = classify_image(image_url=link, num_predictions=5, username=username)
+        return render(request, 'image_classification.html', {'top_k': top_k})
+    except MultiValueDictKeyError as e:
+        print(e)
+        return render(request, 'image_classification.html', {'top_k': []})
 
 
 @user_passes_test(lambda u: u.is_superuser)

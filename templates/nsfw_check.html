@@ -1,13 +1,14 @@
 <div class="ui fluid action input">
     <input type="text" placeholder="Enter link" id="nsfw-link" oninput="load_image_if_available()">
-    <button class="ui button" onclick="check()">Check</button>
+    <button class="ui button" onclick="check()">NSFW-Check</button>
+    <button class="ui button" onclick="classify()">Classify</button>
 </div>
 <div id="progress-bar" style="padding-top: 8px;"></div>
 <div id="loading-indicator">
     <div class="ui small text loader">Checking</div>
 </div>
 <img class="ui centered medium rounded image" src="static/img/placeholder-image.png" id="image" style="padding-top: 8px;">
-
+<div id="classification"></div>
 
 <script>
 function check() {
@@ -21,6 +22,20 @@ function check() {
     .done(function(response) {
         document.getElementById('loading-indicator').className = "";
         $('#progress-bar').replaceWith(response);
+    });
+}
+
+function classify() {
+    document.getElementById('loading-indicator').className = "ui active inverted dimmer";
+    var link = document.getElementById('nsfw-link').value;
+    $.ajax({
+        type: "GET",
+        url: {% url 'submit_to_classification' %},
+        data: {'link': link}
+    })
+    .done(function(response) {
+        document.getElementById('loading-indicator').className = "";
+        $('#classification').html(response);
     });
 }
 

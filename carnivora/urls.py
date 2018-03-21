@@ -43,4 +43,6 @@ urlpatterns = [
     url(r'^load_registration/$', views.load_registration, name="load_registration"),
     url(r'^logout_user/$', views.logout_user, name="logout_user"),
     url(r'^load_screenshot/$', views.load_screenshot, name="load_screenshot"),
+    url(r'^submit_to_classification/$', views.submit_to_classification, name="submit_to_classification"),
+
 ]
