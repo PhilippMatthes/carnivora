@@ -4,14 +4,89 @@ config_store_path = "carnivora/instabot/config.pickle"
 
 standard_config = {
     "bot_path": "carnivora/instabot/",
+    "nsfw_hashtags": [
+        "#instansfw",
+        "#instaadult",
+        "#instagirls",
+        "#instaamateur",
+        "#instaphoto",
+        "#instahentai",
+        "#instalive",
+        "#instachaturbate",
+        "#nsfw",
+        "#adult",
+        "#girls",
+        "#amateur",
+        "#girl",
+        "#photo",
+        "#hentai",
+        "#live",
+        "#chaturbate",
+        "#boob",
+        "#bath",
+        "#bubble",
+        "#hotties",
+        "#hotty",
+        "#nsfwvideo",
+        "#cuckold",
+        "#account",
+        "#purpleport",
+        "#stuff",
+        "#twitterafterdark",
+        "#blowjob",
+        "#vip",
+        "#access",
+        "#movies",
+        "#instaporn",
+        "#instavideo",
+        "#instavideos",
+        "#instaxxx",
+        "#instawomen",
+        "#instaporno",
+        "#instaasian",
+        "#instaphotos",
+        "#asian",
+        "#photos",
+        "#pornvideos",
+        "#freeporn",
+        "#tube",
+        "#pornvideo",
+        "#pictures",
+        "#porntube",
+        "#pics",
+        "#sites",
+        "#pornmovies",
+        "#men",
+        "#vids",
+        "#having",
+        "#sexscene",
+        "#freesex",
+        "#com",
+        "#analsex",
+        "#sexvideos",
+        "#naked",
+        "#instanaked",
+        "#xxx",
+        "#instamodel",
+        "#model",
+        "#instacam",
+        "#cam",
+        "#instatruth",
+        "#instalove",
+        "#love",
+        "#body",
+        "#sleeping",
+        "#getnaked",
+        "#sweat",
+        "#blood",
+        "#man",
+    ],
     "topics": ["graphics", "render", "cartoon", "daily", "art", "design", "cinema4d", "animation", "cg",
                "illustration", "3d", "corona", "octane", "rendering", "sculpting"],
     "start_url": "https://www.instagram.com/accounts/login/",
-    "following_link": "https://www.instagram.com/{}/following/",
     "account_url": "https://www.instagram.com/{}/",
     "sections_xpath": "//*[contains(@class, '_75ljm _3qhgf')]",
     "local_name_xpath": ".//a[@class='_2g7d5 notranslate _nodr2']",
-    "local_follow_xpath": "//a[@class='_ov9ai']",
     "hashtags_xpath": "//*[contains(@class, '_ezgzd')]",
     "first_ele_xpath": "//*[contains(@class, '_si7dy')]",
     "following_xpath": "//*[contains(@class, '_ohbcb _gvoze coreSpriteDesktopNavActivity')]",
@@ -19,10 +94,8 @@ standard_config = {
     "unfollow_xpath": "//*[contains(@class, '_qv64e _t78yp _r9b8f _njrw0')]",
     "comment_xpath": "//*[contains(@class, '_bilrf')]",
     "comment_submit_xpath": "//*[contains(@class, '_8scx2 coreSpriteComment')]",
-    "error_xpath": "//*[contains(@class, 'error-container -cx-PRIVATE-ErrorPage__errorContainer')]",
     "dialog_xpath": "//*[contains(@class, '_pfyik _lz8g1')]",
     "author_xpath": "//*[contains(@class, '_2g7d5 notranslate _iadoq')]",
-    "next_button_xpath": "//*[contains(@class, '_3a693 coreSpriteRightPaginationArrow')]",
     "like_button_xpath": "//*[contains(@class, '_8scx2 coreSpriteHeartOpen')]",
     "like_button_full_xpath": "//*[contains(@class, '_8scx2 coreSpriteHeartFull')]",
     "image_div_container_xpath": "//div[contains(@class,'_sxolz')]",
@@ -45,7 +118,20 @@ class ConfigLoader:
     def load():
         try:
             with open(config_store_path, "rb") as f:
-                return pickle.load(f)
+                config = pickle.load(f)
+                for key in standard_config.keys():
+                    if key not in config.keys():
+                        config[key] = standard_config[key]
+                        with open(config_store_path, "wb") as f:
+                            pickle.dump(config, f)
+                        print("Added key ({}) to stored config as it is now needed from new features.".format(key))
+                for key in config.copy().keys():
+                    if key not in standard_config.keys():
+                        del config[key]
+                        with open(config_store_path, "wb") as f:
+                            pickle.dump(config, f)
+                        print("Removed key ({}) from stored config as it is no longer needed.".format(key))
+                return config
         except FileNotFoundError:
             with open(config_store_path, "wb") as f:
                 pickle.dump(standard_config, f)
@@ -63,16 +149,16 @@ class ConfigLoader:
 class Config:
     config = ConfigLoader.load()
 
+    nsfw_hashtags = config["nsfw_hashtags"]
+
     bot_path = config["bot_path"]
 
     topics = config["topics"]
     start_url = config["start_url"]
-    following_link = config["following_link"]
     account_url = config["account_url"]
 
     sections_xpath = config["sections_xpath"]
     local_name_xpath = config["local_name_xpath"]
-    local_follow_xpath = config["local_follow_xpath"]
 
     hashtags_xpath = config["hashtags_xpath"]
 
@@ -83,12 +169,10 @@ class Config:
     unfollow_xpath = config["unfollow_xpath"]
     comment_xpath = config["comment_xpath"]
     comment_submit_xpath = config["comment_submit_xpath"]
-    error_xpath = config["error_xpath"]
 
     dialog_xpath = config["dialog_xpath"]
 
     author_xpath = config["author_xpath"]
-    next_button_xpath = config["next_button_xpath"]
     like_button_xpath = config["like_button_xpath"]
     like_button_full_xpath = config["like_button_full_xpath"]
 
