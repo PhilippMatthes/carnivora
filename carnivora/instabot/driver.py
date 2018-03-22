@@ -197,7 +197,8 @@ class Driver(threading.Thread):
             actions.send_keys(say)
             actions.perform()
             comment_button.click()
-            Log.update(self.screenshot_path, self.browser, log_path, "Commented on "+str(author)+"s picture with: "+say)
+            Log.update(self.screenshot_path, self.browser, log_path,
+                       "Commented on " + str(author) + "s picture with: " + say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
 
     def search(self, browser, log_path, query):
@@ -271,7 +272,7 @@ class Driver(threading.Thread):
                 return
             like_button.click()
             src = self.extract_picture_source(browser=browser, log_path=log_path)
-            Log.update(self.screenshot_path, self.browser, log_path, "Liked picture/video by: "+author, image=src)
+            Log.update(self.screenshot_path, self.browser, log_path, "Liked picture/video by: " + author, image=src)
             self.update_action_list(author=author, action_type="like", topic=topic)
 
     # Unfollows a user
@@ -385,6 +386,12 @@ class Driver(threading.Thread):
 
     def store_hashtags(self, browser, log_path, timeout=5):
         if self.running():
+            all_hashtags = self.extract_hash_tags(browser=browser, log_path=log_path, timeout=timeout)
+            for hashtag in all_hashtags:
+                self.update_hashtags(hashtag=hashtag)
+
+    def extract_hash_tags(self, browser, log_path, timeout=5):
+        if self.running():
             try:
                 WebDriverWait(browser, timeout).until(
                     ec.presence_of_element_located((By.XPATH, Config.hashtags_xpath))
@@ -392,19 +399,15 @@ class Driver(threading.Thread):
                 sections = browser.find_elements_by_xpath(Config.hashtags_xpath)
             except NoSuchElementException:
                 Log.update(self.screenshot_path, self.browser, log_path,
-                           'Exception in store_hashtags: ' + str(format_exc()))
-                return
+                           'Exception in extract_hash_tags: ' + str(format_exc()))
+                return []
             except TimeoutException:
-                Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in store_hashtags')
-                return
+                Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in extract_hash_tags')
+                return []
+            all_hashtags = []
             for section in sections:
-                all_hashtags = self.extract_hash_tags(section.text)
-                for hashtag in all_hashtags:
-                    self.update_hashtags(hashtag=hashtag)
-
-    def extract_hash_tags(self, s):
-        if self.running():
-            return set(part[1:] for part in s.split() if part.startswith('#'))
+                all_hashtags.extend(set(part[1:] for part in section.text.split() if part.startswith('#')))
+            return all_hashtags
 
     def extract_picture_source(self, browser, log_path, timeout=5):
         if self.running():
@@ -429,8 +432,32 @@ class Driver(threading.Thread):
                     return
                 return image.get_attribute("src")
 
+    def post_hashtags_are_sfw(self, browser, log_path, timeout=5):
+        if self.running():
+            all_hashtags = self.extract_hash_tags(browser=browser, log_path=log_path, timeout=timeout)
+            for hashtag in all_hashtags:
+                if hashtag in Config.nsfw_hashtags:
+                    Log.update(
+                        screenshot_path=self.screenshot_path,
+                        browser=self.browser,
+                        log_path=self.log_path,
+                        text="This post contains the blacklisted hashtag {}.".format(hashtag),
+                    )
+                    return False
+            Log.update(
+                screenshot_path=self.screenshot_path,
+                browser=self.browser,
+                log_path=self.log_path,
+                text="This post contains none of the blacklisted hashtags.",
+            )
+            return True
+
     def post_is_sfw(self, browser, log_path, limit=0.1):
         if self.running():
+
+            if not self.post_hashtags_are_sfw(browser=browser, log_path=log_path):
+                return False
+
             image_url = self.extract_picture_source(browser=browser, log_path=log_path)
             if not image_url:
                 Log.update(
