@@ -311,4 +311,15 @@ def perform_reboot(request):
 def settings(request):
     config = ConfigLoader.load()
     sorted_config = sorted(config.items(), key=operator.itemgetter(0))
-    return render(request, 'settings.html', {'sorted_config': sorted_config})
+    filtered_config = [(k, v) for k, v in sorted_config if
+                       k != "nsfw_hashtags" and
+                       k != "comments" and
+                       k != "topics" and
+                       k != "smileys"]
+    return render(request, 'settings.html', {
+        'filtered_config': filtered_config,
+        'nsfw_hashtags': config['nsfw_hashtags'],
+        'comments': config['comments'],
+        'topics': config['topics'],
+        'smileys': config['smileys'],
+    })
