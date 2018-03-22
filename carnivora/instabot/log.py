@@ -14,7 +14,7 @@ class Log:
         try:
             with open(log_path, "rb") as f:
                 log = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             pass
         log.append([date, text, image])
         with open(log_path, "wb") as f:
@@ -26,7 +26,7 @@ class Log:
         try:
             with open(log_path, "rb") as f:
                 log = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             pass
         if search == '' or search is None:
             return reversed(log[-page_size:])

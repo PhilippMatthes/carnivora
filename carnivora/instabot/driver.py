@@ -54,14 +54,14 @@ class Driver(threading.Thread):
         try:
             with open(self.interacting_users_path, "rb") as f:
                 self.interacting_users = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             with open(self.interacting_users_path, "wb") as f:
                 self.interacting_users = []
                 pickle.dump([], f)
         try:
             with open(self.hashtags_path, "rb") as f:
                 self.hashtags = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             with open(self.hashtags_path, "wb") as f:
                 self.hashtags = {}
                 for h in Config.topics:
@@ -70,21 +70,21 @@ class Driver(threading.Thread):
         try:
             with open(self.action_list_path, "rb") as f:
                 self.action_list = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             with open(self.action_list_path, "wb") as f:
                 self.action_list = {}
                 pickle.dump({}, f)
         try:
             with open(self.followed_users_all_time_path, "rb") as f:
                 self.followed_accounts = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             with open(self.followed_users_all_time_path, "wb") as f:
                 self.followed_accounts = {}
                 pickle.dump({}, f)
         try:
             with open(self.accounts_to_unfollow_path, "rb") as f:
                 self.accounts_to_unfollow = pickle.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             with open(self.accounts_to_unfollow_path, "wb") as f:
                 self.accounts_to_unfollow = []
                 pickle.dump([], f)
@@ -114,7 +114,7 @@ class Driver(threading.Thread):
         try:
             with open(self.running_path, "rb") as f:
                 return bool(pickle.load(f))
-        except FileNotFoundError:
+        except (FileNotFoundError, EOFError):
             return False
 
     @staticmethod
