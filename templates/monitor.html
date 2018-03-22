@@ -1,34 +1,17 @@
-<div class="ui grid">
-<div class="four wide column" id="screen">
-    <div class="ui rounded blurring segment" style="padding: 0px;">
-    <div class="ui fade reveal">
-      <div class="visible content">
-        <img class="ui fluid centered image" onclick="show_modal()" src="{{ src }}" id="screenshot">
-      </div>
-      <div class="hidden content">
-          <img class="ui fluid centered image" onclick="show_modal()" src="{{ src }}" id="screenshot_blurry">
-          <div class="ui active dimmer" id="dimmer">
-            <div class="content">
-              <h2 class="ui icon header">
-                <i class="heart icon"></i>
-                Fullscreen
-              </h2>
+<div class="ui one column stackable center aligned page grid">
+    <div class="column twelve wide">
+        <div class="ui form">
+            <div class="inline fields" id="button-chain"></div>
+        </div>
+        <div id="screen">
+            <img class="ui fluid rounded image" onclick="show_modal()" src="{{ src }}" id="screenshot">
+            <div class="ui modal" id="modal">
+              <div class="scrolling content">
+                <img class="ui fluid rounded centered image" src="{{ src }}" id="modal_screenshot">
+              </div>
             </div>
-          </div>
-      </div>
+        </div>
     </div>
-    </div>
-    <div class="ui modal" id="modal">
-      <div class="scrolling content">
-        <img class="ui fluid rounded centered image" src="{{ src }}" id="modal_screenshot">
-      </div>
-    </div>
-</div>
-<div class="eight wide column">
-<div class="ui form">
-    <div class="inline fields" id="button-chain"></div>
-</div>
-</div>
 </div>
 
 <table class="ui green striped table" style="width: 100%; table-layout: fixed;">
@@ -39,10 +22,10 @@
     </colgroup>
     <thead>
         <th>
-            <button class="ui fluid loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
+            <button class="ui fluid green loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
         </th>
         <th style="word-wrap: break-word; max-width: 150px;">
-            <div class="ui icon input">
+            <div class="ui icon green input">
                 <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
             </div>
         </th>
@@ -85,7 +68,7 @@ function show_modal() {
 function load_button_chain() {
     $.ajax({
         type: "GET",
-        url: {% url 'load_button_chain' %},
+        url: {% url 'load_button_chain' %}
     })
     .done(function(response) {
         $('#button-chain').replaceWith(response);

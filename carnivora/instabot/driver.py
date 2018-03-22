@@ -448,7 +448,7 @@ class Driver(threading.Thread):
                 screenshot_path=self.screenshot_path,
                 browser=self.browser,
                 log_path=self.log_path,
-                text="This post contains none of the blacklisted hashtags.",
+                text="This post contains none of the blacklisted hashtags. (Hashtags: {})".format(", ".join(all_hashtags)),
             )
             return True
 

@@ -1,22 +1,5 @@
 <div class="four wide column" id="screen">
-    <div class="ui rounded blurring segment" style="padding: 0px;">
-    <div class="ui fade reveal">
-      <div class="visible content">
-        <img class="ui fluid centered image" onclick="show_modal()" src="{{ src }}" id="screenshot">
-      </div>
-      <div class="hidden content">
-          <img class="ui fluid centered image" onclick="show_modal()" src="{{ src }}" id="screenshot_blurry">
-          <div class="ui active dimmer">
-            <div class="content">
-              <h2 class="ui icon header">
-                <i class="heart icon"></i>
-                Fullscreen
-              </h2>
-            </div>
-          </div>
-      </div>
-    </div>
-    </div>
+    <img class="ui fluid rounded centered image" onclick="show_modal()" src="{{ src }}" id="screenshot">
     <div class="ui modal" id="modal">
       <div class="scrolling content">
         <img class="ui fluid rounded centered image" src="{{ src }}" id="modal_screenshot">
