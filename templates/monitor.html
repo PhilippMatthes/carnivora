@@ -1,52 +1,4 @@
-<div class="ui form">
-    <div class="inline fields">
-        <div class="inline fields">
-            <div class="field">
-                <button class="ui loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
-            </div>
-            <div class="field">
-                <div class="ui icon input">
-                    <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui icon input">
-                    <input type="number" min="0" step="1" placeholder="Results" id="n" oninput="get_monitor_updates()">
-                </div>
-            </div>
-        </div>
-    <div class="inline fields" id="button-chain"></div>
-    </div>
-</div>
-
 <div class="ui grid">
-  <div class="twelve wide column">
-      <table class="ui table" style="width: 100%; table-layout: fixed;">
-    <colgroup>
-        <col style="width:20%">
-        <col style="width:70%">
-        <col style="width:10%">
-    </colgroup>
-    <thead>
-        <th>Date (UTC)</th>
-        <th style="word-wrap: break-word; max-width: 150px;">Description</th>
-        <th>Image</th>
-    </thead>
-    <tbody id="auto-updating-monitor">
-    {% for line in lines %}
-    <tr>
-        <td>{{ line.0 }}</td>
-        <td>{{ line.1 }}</td>
-        {% if line.2 != "" and line.2 != None %}
-            <td><img width="50" height="50" src={{ line.2 }}></td>
-        {% else %}
-            <td></td>
-        {% endif %}
-    </tr>
-{% endfor %}
-    </tbody>
-</table>
-</div>
 <div class="four wide column" id="screen">
     <div class="ui rounded blurring segment" style="padding: 0px;">
     <div class="ui fade reveal">
@@ -72,7 +24,53 @@
       </div>
     </div>
 </div>
+<div class="eight wide column">
+<div class="ui form">
+    <div class="inline fields" id="button-chain"></div>
 </div>
+</div>
+</div>
+
+<table class="ui green striped table" style="width: 100%; table-layout: fixed;">
+    <colgroup>
+        <col style="width:20%">
+        <col style="width:70%">
+        <col style="width:10%">
+    </colgroup>
+    <thead>
+        <th>
+            <button class="ui fluid loading button" id="loading-button" onclick="switch_updates()">Upd.</button>
+        </th>
+        <th style="word-wrap: break-word; max-width: 150px;">
+            <div class="ui icon input">
+                <input type="text" placeholder="Search..." id="search" oninput="get_monitor_updates()">
+            </div>
+        </th>
+        <th>Image</th>
+    </thead>
+    <tbody id="auto-updating-monitor">
+    {% for line in lines %}
+    <tr>
+        <td>{{ line.0 }}</td>
+        <td>{{ line.1 }}</td>
+        {% if line.2 != "" and line.2 != None %}
+            <td><img width="30" height="30" src={{ line.2 }}></td>
+        {% else %}
+            <td></td>
+        {% endif %}
+    </tr>
+{% endfor %}
+    </tbody>
+    <tf>
+        <td>
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="number" min="0" step="1" placeholder="Results" id="n" oninput="get_monitor_updates()">
+                </div>
+            </div
+        </td>
+    </tf>
+</table>
 
 <script src="static/css/Semantic-UI-CSS-master/semantic.js"></script>
 <script>

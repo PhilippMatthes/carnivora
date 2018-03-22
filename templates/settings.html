@@ -1,4 +1,4 @@
-<div class="ui segment">
+<div class="ui red inverted segment">
 <h2 class="ui header">Disallowed hashtags</h2>
 <select id="disallowed-hashtags" class="ui fluid search dropdown" multiple="">
 {% for hashtag in nsfw_hashtags %}
@@ -6,31 +6,25 @@
 {% endfor %}
 </select>
 </div>
-<div class="ui segment">
 <h2 class="ui header">Comments</h2>
 <select id="comments" class="ui fluid search dropdown" multiple="">
     {% for comment in comments %}
     <option value="{{ comment }}">{{ comment }}</option>
     {% endfor %}
 </select>
-</div>
-<div class="ui segment">
 <h2 class="ui header">Topics</h2>
 <select id="topics" class="ui fluid search dropdown" multiple="">
     {% for topic in topics %}
     <option value="{{ topic }}">{{ topic }}</option>
     {% endfor %}
 </select>
-</div>
-<div class="ui segment">
 <h2 class="ui header">Smileys</h2>
 <select id="smileys" class="ui fluid search dropdown" multiple="">
     {% for smiley in smileys %}
     <option value="{{ smiley }}">{{ smiley }}</option>
     {% endfor %}
 </select>
-</div>
-
+<h2 class="ui header">Miscellaneous</h2>
 {% for tuple in filtered_config %}
     <div class="ui labeled fluid input" style="padding: 8px;">
         <div class="ui label">{{ tuple.0 }}</div>
@@ -45,13 +39,13 @@
 {% endfor %}
 
 <script>
-$('#disallowed-hashtags').dropdown({allowAdditions: true});
+$('#disallowed-hashtags').dropdown({allowAdditions: false});
 $('#disallowed-hashtags').dropdown('set selected', {{ nsfw_hashtags|safe }});
-$('#comments').dropdown({allowAdditions: true});
+$('#comments').dropdown({allowAdditions: false});
 $('#comments').dropdown('set selected', {{ comments|safe }});
-$('#topics').dropdown({allowAdditions: true});
+$('#topics').dropdown({allowAdditions: false});
 $('#topics').dropdown('set selected', {{ topics|safe }});
-$('#smileys').dropdown({allowAdditions: true});
+$('#smileys').dropdown({allowAdditions: false});
 $('#smileys').dropdown('set selected', {{ smileys|safe }});
 
 
