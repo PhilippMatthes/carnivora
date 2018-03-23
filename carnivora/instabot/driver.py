@@ -189,7 +189,6 @@ class Driver(threading.Thread):
             comment_button.click()
             actions = ActionChains(browser)
             actions.send_keys(say)
-            actions.pause(1)
             actions.send_keys(Keys.RETURN)
             actions.perform()
             Log.update(self.screenshot_path, self.browser, log_path,
