@@ -498,7 +498,7 @@ class Driver(threading.Thread):
 
                     sleep(delay)
 
-                    if True:
+                    if action == "comment":
                         if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                             self.comment(
                                 topic=topic,
