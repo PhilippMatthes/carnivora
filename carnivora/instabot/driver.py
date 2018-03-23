@@ -180,6 +180,12 @@ class Driver(threading.Thread):
             query = Config.comments[randint(0, len(Config.comments) - 1)]
             say = query.format(author, Config.smileys[randint(0, len(Config.smileys) - 1)])
             try:
+                WebDriverWait(browser, timeout).until(
+                    ec.presence_of_element_located((By.XPATH, Config.comment_xpath))
+                )
+                comment_field = WebDriverWait(browser, timeout).until(
+                    ec.element_to_be_clickable((By.XPATH, Config.comment_xpath))
+                )
                 comment_button = WebDriverWait(browser, timeout).until(
                     ec.element_to_be_clickable((By.XPATH, Config.comment_submit_xpath))
                 )
@@ -187,10 +193,8 @@ class Driver(threading.Thread):
                 Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in comment')
                 return
             comment_button.click()
-            actions = ActionChains(browser)
-            actions.send_keys(say)
-            actions.send_keys(Keys.RETURN)
-            actions.perform()
+            comment_field.send_keys(say)
+            comment_field.send_keys(Keys.RETURN)
             Log.update(self.screenshot_path, self.browser, log_path,
                        "Commented on " + str(author) + "s picture with: " + say)
             self.update_action_list(author=author, action_type="comment", topic=topic)
