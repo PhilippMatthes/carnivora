@@ -184,7 +184,7 @@ class Driver(threading.Thread):
                 WebDriverWait(browser, timeout).until(
                     ec.presence_of_element_located((By.XPATH, Config.comment_xpath))
                 )
-                comment_field = WebDriverWait(browser, timeout).until(
+                WebDriverWait(browser, timeout).until(
                     ec.element_to_be_clickable((By.XPATH, Config.comment_xpath))
                 )
                 comment_button = WebDriverWait(browser, timeout).until(
@@ -194,7 +194,7 @@ class Driver(threading.Thread):
                 Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in comment')
                 return
             comment_button.click()
-            sleep(5)
+            comment_field = browser.find_element_by_xpath(Config.comment_xpath)
             comment_field.send_keys(say)
             comment_field.send_keys(Keys.RETURN)
             Log.update(self.screenshot_path, self.browser, log_path,
