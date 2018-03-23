@@ -7,6 +7,8 @@ from traceback import format_exc
 from selenium import webdriver  # For webpage crawling
 from time import sleep
 
+import platform
+
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
@@ -20,7 +22,6 @@ from selenium.webdriver.support import expected_conditions as ec
 from carnivora.instabot.config import Config
 from carnivora.instabot.dispatcher import Dispatcher
 from carnivora.instabot.log import Log
-from tf_imagenet.imagenet import classify_image
 
 from tf_open_nsfw.classify_nsfw import classify_nsfw
 
@@ -193,6 +194,7 @@ class Driver(threading.Thread):
                 Log.update(self.screenshot_path, self.browser, log_path, 'Timeout in comment')
                 return
             comment_button.click()
+            sleep(5)
             comment_field.send_keys(say)
             comment_field.send_keys(Keys.RETURN)
             Log.update(self.screenshot_path, self.browser, log_path,
@@ -432,7 +434,7 @@ class Driver(threading.Thread):
 
     def post_hashtags_are_sfw(self, browser, log_path, timeout=5):
         if self.running():
-            all_hashtags = self.extract_hash_tags(browser=browser, log_path=log_path, timeout=timeout)
+            all_hashtags = ["#"+x for x in self.extract_hash_tags(browser=browser, log_path=log_path, timeout=timeout)]
             for hashtag in all_hashtags:
                 if hashtag in Config.nsfw_hashtags:
                     Log.update(
@@ -496,7 +498,6 @@ class Driver(threading.Thread):
 
                     sleep(delay)
 
-                    # if action == "comment":
                     if True:
                         if self.post_is_sfw(browser=self.browser, log_path=self.log_path):
                             self.comment(
