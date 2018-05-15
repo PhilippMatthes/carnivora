@@ -13,6 +13,7 @@ sudo pip3 install selenium
 sudo pip3 install urllib
 sudo pip3 install urllib3
 sudo pip3 install pandas
+sudo pip3 install django
 ```
 
 Next up, clone this repository with `sudo git clone https://github.com/PhilippMatthes/carnivora`.
