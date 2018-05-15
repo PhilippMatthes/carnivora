@@ -10,10 +10,10 @@ Install the needed dependencies:
 sudo pip3 install --upgrade scikit-image
 sudo pip3 install --upgrade tensorflow
 sudo pip3 install --upgrade selenium
-sudo pip3 install --upgrade urllib
 sudo pip3 install --upgrade urllib3
 sudo pip3 install --upgrade pandas
 sudo pip3 install --upgrade django
+sudo pip3 install --upgrade numpy
 ```
 
 Next up, clone this repository with `sudo git clone https://github.com/PhilippMatthes/carnivora`.
