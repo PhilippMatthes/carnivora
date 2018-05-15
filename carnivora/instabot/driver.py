@@ -165,7 +165,7 @@ class Driver(threading.Thread):
         with open(self.action_list_path, "wb") as f:
             pickle.dump(self.action_list, f)
 
-    def on_dialog_page(self, browser, log_path, check_timeout=1):
+    def on_dialog_page(self, browser, log_path, check_timeout=5):
         if self.running():
             try:
                 WebDriverWait(browser, check_timeout).until(
