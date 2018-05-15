@@ -306,7 +306,7 @@ class Driver(threading.Thread):
             pickle.dump(self.followed_accounts, userfile)
 
     # Follows a user
-    def follow(self, browser, log_path, topic, timeout=5):
+    def follow(self, browser, log_path, topic, timeout=15):
         if self.running():
             author = self.author(browser=browser, log_path=log_path)
             try:
