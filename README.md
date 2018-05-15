@@ -16,6 +16,13 @@ sudo pip3 install --upgrade django
 sudo pip3 install --upgrade numpy
 ```
 
+### Troubleshooting
+
+If you are getting `Original error was: libf77blas.so.3: cannot open shared object file: No such file or directory`, try entering the following command:
+```
+sudo apt-get install libatlas-base-dev
+```
+
 Next up, clone this repository with `sudo git clone https://github.com/PhilippMatthes/carnivora`.
 
 Run the server with `sudo path/to/your/python3 manage.py runserver 127.0.0.1:8000`
