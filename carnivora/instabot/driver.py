@@ -102,7 +102,7 @@ class Driver(threading.Thread):
 
         path = os.path.dirname(os.path.realpath(__file__))
         phantom_js_path = path + "phantomjs"
-        self.browser = webdriver.PhantomJS(phantomjspath)
+        self.browser = webdriver.PhantomJS(phantom_js_path)
         self.browser.set_window_size(window_width, window_height)
         self.screenshot_path = screenshot_path
 
