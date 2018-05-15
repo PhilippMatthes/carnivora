@@ -34,9 +34,3 @@ Please follow the instructions on the Django website to deploy your server. Keep
 This Project uses [tensorflow-open_nsfw](https://github.com/mdietrichstein/tensorflow-open_nsfw) by Marc Dietrichstein
 for image classification and Semantic UI.
 
-Carnivora uses the following libraries:
-- skimage
-- TensorFlow
-- Selenium Webdriver
-- urllib
-- urllib3
