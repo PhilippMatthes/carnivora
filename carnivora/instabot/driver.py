@@ -101,7 +101,7 @@ class Driver(threading.Thread):
             print("Selenium Webdriver will run without Xvfb. Install Xvfb to run Selenium Webdriver inside Xvfb.")
 
         path = os.path.dirname(os.path.realpath(__file__))
-        phantom_js_path = path + "phantomjs"
+        phantom_js_path = path + "/phantomjs"
         self.browser = webdriver.PhantomJS(phantom_js_path)
         self.browser.set_window_size(window_width, window_height)
         self.screenshot_path = screenshot_path
