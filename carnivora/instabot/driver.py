@@ -167,15 +167,16 @@ class Driver(threading.Thread):
 
     def on_dialog_page(self, browser, log_path, check_timeout=5):
         if self.running():
-            try:
-                WebDriverWait(browser, check_timeout).until(
-                    ec.presence_of_element_located((By.XPATH, Config.dialog_xpath))
-                )
-            except (TimeoutException, NoSuchElementException):
-                Log.update(self.screenshot_path, self.browser, log_path, 'No longer on dialog page.')
-                return False
-            else:
-                return True
+            return True
+            #try:
+            #    WebDriverWait(browser, check_timeout).until(
+            #        ec.presence_of_element_located((By.XPATH, Config.dialog_xpath))
+            #    )
+            #except (TimeoutException, NoSuchElementException):
+            #    Log.update(self.screenshot_path, self.browser, log_path, 'No longer on dialog page.')
+            #    return False
+            #else:
+            #    return True
 
     def comment(self, topic, browser, log_path, timeout=5):
         if self.running():
