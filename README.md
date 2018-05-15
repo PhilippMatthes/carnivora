@@ -15,6 +15,7 @@ sudo pip3 install --upgrade pandas
 sudo pip3 install --upgrade django
 sudo pip3 install --upgrade numpy
 sudo pip3 install --upgrade xvfbwrapper
+sudo pip3 install --upgrade scipy
 ```
 
 ### Troubleshooting
