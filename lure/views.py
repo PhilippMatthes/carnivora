@@ -191,7 +191,10 @@ def monitor(request):
     if not request.user.is_authenticated:
         return
     path = "static/img/" + request.user.username + "/screenshot.png"
-    time = os.path.getmtime(path)
+    try:
+        time = os.path.getmtime(path)
+    except FileNotFoundError:
+        time = 0
     src = path + "?mtime=" + str(time)
 
     # pages = range(Log.number_of_pages(page_size=page_size))
