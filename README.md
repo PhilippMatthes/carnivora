@@ -1,3 +1,5 @@
+# This repository is not actively maintained. Pull Requests are welcome!
+
 # carnivora
 
 ![Showcase](MOCKUP.jpg?raw=true "DragTimer App")
